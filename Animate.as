@@ -4,7 +4,9 @@
 	import flash.events.MouseEvent;
 	
 	public class Animate extends MovieClip{
-
+		public var animateSweet:Sweet;
+		public var animateGame:SweetSmash;
+		
 		//Jiggle
 		private var leftJiggle:int;
 		private var rightJiggle:uint;
@@ -38,18 +40,33 @@
 		private var particleList:Array = new Array();
 		private var vectorX:Number;
 		private var vectorY:Number;
-		private var mySweet:Sweet;
-		private var myGame:SweetSmash;
 		private var explodeFrameCount:uint;
 		private var explodeMaxFrameCount:uint;
 		private var explodeBlock:Boolean;
 		private var explodeParticleCount:uint;
+		
+		//Move To Position
+		private var moveToDestinationX:int;
+		private var moveToDestinationY:int;
+		private var moveToStepX:Number;
+		private var moveToStepY:Number;
+		private var moveToFrameCount:uint;
+		private var moveToMaxFrameCount:uint;
 		
 		//Move Down
 		private var isMovingDown:Boolean;
 		private var moveDownSpeed:Number;
 		private var depthGoal:int;
 		
+		//Wiggle
+		private var wiggleRotateLeft:Boolean;
+		private var wiggleScaleUp:Boolean;
+		private var wiggleRotateStep:Number;
+		private var isWiggling:Boolean;
+		
+		//#########################
+		//#	Constructor
+		//#########################
 		public function Animate() {
 			// constructor code
 			this.isJiggling = false;
@@ -154,28 +171,31 @@
 		//#########################
 		//#	Explode on Mouse Event
 		//#########################
-		public function explodeOn(mySweet:Sweet,myGame:SweetSmash):void{
-			this.mySweet = mySweet;
-			this.myGame = myGame;
+		public function explodeOnClick():void{
 			this.explodeFrameCount = 0;
 			this.explodeMaxFrameCount = 60;
 			this.explodeBlock = false;
 			this.explodeParticleCount = 30;
-			this.addEventListener(MouseEvent.MOUSE_DOWN,startExplode);
+			this.addEventListener(MouseEvent.MOUSE_DOWN,explode);
 		}
 		
-		private function startExplode(event:MouseEvent):void{
+		public function startExplode():void{
+			this.explodeFrameCount = 0;
+			this.explodeMaxFrameCount = 60;
+			this.explodeBlock = false;
+			this.explodeParticleCount = 30;
+			this.performExplode();
+		}
+		
+		private function performExplode():void{
 			//Remove the icon which was clicked
-			//this.mySweet.mouseEnabled = false;
-			//this.mySweet.startBlink(3,20);
-			this.myGame.removeChild(mySweet);
+			this.animateGame.removeChild(this.animateSweet);
 			
-			//this.myGame.removeChild(mySweet);
 			//Place 10 items on the center of the clicked icon
 			if(!this.explodeBlock){
 				this.explodeBlock = true;
 				for(var i:uint=0; i<this.explodeParticleCount; i++){
-					this.particleList.push(new Sweet(this.mySweet.x,this.mySweet.y,this.mySweet.defaultFrame));
+					this.particleList.push(new Sweet(this.animateSweet.x,this.animateSweet.y,this.animateGame));
 					this.particleList[i].scaleX = 0.5;
 					this.particleList[i].scaleY = this.particleList[i].scaleX;
 					this.particleList[i].rotation = Math.floor(Math.random() * 360);
@@ -185,12 +205,15 @@
 					this.particleList[i].startPulse(0.3,0.5,0.1);
 					this.particleList[i].startFade(60,true);
 					this.particleList[i].mouseEnabled = false;
-					this.myGame.addChild(this.particleList[i]);
+					this.animateGame.addChild(this.particleList[i]);
 				}
 				this.addEventListener(Event.ENTER_FRAME,animateExplode);
 			}else{
 				trace("Ignored startExplode since it is already in progress from a prior click.");
 			}
+		}
+		private function explode(event:MouseEvent):void{
+			this.performExplode();
 		}
 		
 		private function animateExplode(event:Event):void{
@@ -207,7 +230,7 @@
 			if(this.explodeFrameCount >= this.explodeMaxFrameCount){
 				//Explosion has ended
 				for(i=0; i<this.particleList.length; i++){
-					this.myGame.removeChild(this.particleList[i]);
+					this.animateGame.removeChild(this.particleList[i]);
 				}
 				this.particleList = new Array();
 				this.removeEventListener(Event.ENTER_FRAME,animateExplode);
@@ -239,6 +262,49 @@
 				this.rotation -= 360;
 			}
 		}
+		//#########################
+		//#	Move To Position
+		//#########################
+		public function moveToPositionOnClick(destinationX:int,destinationY:int, speed:Number):void{
+			this.moveToDestinationX = destinationX;
+			this.moveToDestinationY = destinationY;
+			this.moveToMaxFrameCount = speed;
+			this.addEventListener(MouseEvent.MOUSE_DOWN,this.moveToPositionWasClicked);
+		}
+		
+		private function moveToPositionWasClicked(even:MouseEvent):void{
+			this.removeEventListener(MouseEvent.MOUSE_DOWN,this.moveToPositionWasClicked);
+			this.moveToPosition(this.moveToDestinationX,this.moveToDestinationY,this.moveToMaxFrameCount);
+		}
+		
+		public function moveToPosition(destinationX:int, destinationY:int, speed:Number):void{
+			//Block input while the move is occurring
+			this.animateGame.gridInputAllowed = false;
+			
+			this.moveToDestinationX = destinationX;
+			this.moveToDestinationY = destinationY;
+			this.moveToFrameCount = 0;
+			this.moveToMaxFrameCount = speed;
+			this.moveToStepX = (this.moveToDestinationX - this.x)/this.moveToMaxFrameCount;
+			this.moveToStepY = (this.moveToDestinationY - this.y)/this.moveToMaxFrameCount;
+			
+			this.addEventListener(Event.ENTER_FRAME,performMoveToPosition);
+		}
+		
+		private function performMoveToPosition(event:Event):void{
+			this.x += this.moveToStepX;
+			this.y += this.moveToStepY;
+			
+			if(++this.moveToFrameCount == this.moveToMaxFrameCount){
+				//Movement has concluded
+				this.x = this.moveToDestinationX;
+				this.y = this.moveToDestinationY;
+				this.removeEventListener(Event.ENTER_FRAME,performMoveToPosition);
+				
+				//Move has completed
+				this.animateGame.gridInputAllowed = true;
+			}
+		}
 		
 		//#########################
 		//#	Move Down X Units of N Pixels
@@ -265,6 +331,54 @@
 		//#########################
 		//#	Wiggle
 		//#########################
+		public function wiggle(event:MouseEvent):void{
+			if(this.animateGame.gridInputAllowed){
+				this.startWiggle();
+				
+				//Record which sweet is currently chosen
+				this.animateGame.sweet1 = this.animateSweet;
+			}else{
+				trace("Note: Grid input is disabled, so the icon click was ignored.");
+			}
+		}
+		
+		public function startWiggle():void{
+			this.isWiggling = true;
+			this.wiggleRotateLeft = true;
+			this.wiggleScaleUp = true;
+			this.wiggleRotateStep = 2;
+			this.addEventListener(Event.ENTER_FRAME,performWiggle);
+			this.startPulse(1.0,1.1,0.01);
+		}
+		
+		public function stopWiggle():void{
+			if(this.isWiggling){
+				this.removeEventListener(Event.ENTER_FRAME,performWiggle);
+				this.removeEventListener(Event.ENTER_FRAME,performPulse);
+				this.rotation = 0;
+				this.scaleX = 1.0;
+				this.scaleY = 1.0;
+				this.isWiggling = false;
+			}else{
+				trace("Error: Tried to stopWiggle on an icon that wasn't wiggling.");
+			}
+		}
+		
+		private function performWiggle(event:Event):void{
+			//Handle the sway
+			if(this.wiggleRotateLeft){
+				this.rotation -= this.wiggleRotateStep;
+				if(this.rotation <= -20){
+					this.wiggleRotateLeft = false;
+				}
+			}else{
+				this.rotation += this.wiggleRotateStep;
+				if(this.rotation >= 20){
+					this.wiggleRotateLeft = true;
+				}
+			}
+			
+		}
 		
 		//#########################
 		//#	Pulse
