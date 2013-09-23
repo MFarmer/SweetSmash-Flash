@@ -76,21 +76,30 @@
 			var moveToDelay:uint = 20;
 			
 			//Place sweets
-			var index = 0;
+			var rowNumber = 0;
+			var colNumber = 0;
 			for(var i:uint=32; i<608; i+=64){
 				for(var j:uint=96; j<672; j+=64){
 					
-					this.sweetGrid.addSweet(new Sweet(i,j,this,index++));
-					addChild(this.sweetGrid.getLastSweet());
+					//1. Add the sweet to my dictionary
+					this.sweetGrid.grid["row"+rowNumber+"col"+colNumber] = new Sweet(i,j,this,"row"+rowNumber+"col"+colNumber);
+					addChild(this.sweetGrid.grid["row"+rowNumber+"col"+colNumber]);
 					
-					var mySweet = this.sweetGrid.getLastSweet();
+					//Get ready to animate the sweet. It will shoot out from the kitchen to its initial grid position.
+					var mySweet = this.sweetGrid.grid["row"+rowNumber+"col"+colNumber];
 					mySweet.moveToPosition(mySweet.getOriginX(),mySweet.getOriginY(),20,moveToDelay);
+					
+					//I want the sweets to shoot out one at a time at staggered intervals, so increase the delay for the next sweet.
 					moveToDelay += 20;
 					
 					//Setup all sweets to listen for mouse up/down (Drags)
 					mySweet.addEventListener(MouseEvent.MOUSE_DOWN,mySweet.wiggle);
 					mySweet.addEventListener(MouseEvent.MOUSE_UP,this.performSwap);
+					
+					rowNumber++;
 				}
+				rowNumber = 0;
+				colNumber++;
 			}
 		}
 		
@@ -99,29 +108,36 @@
 		//#########################
 		private function performSwap(event:MouseEvent):void{
 			if(this.sweet1 != null){
+				
+				//Block user input until everything has been considered!
+				this.gridInputAllowed = false;
+				
 				this.sweet2 = (event.target as Sweet);
 				
-				trace("Sweets at index "+this.sweet1.myIndex+" and "+this.sweet2.myIndex+" are swapping");
-				this.sweetGrid.swapLogicalSweet(this.sweet1.myIndex,this.sweet2.myIndex);
-				
-				var tempX = this.sweet1.x;
-				var tempY = this.sweet1.y;
-				
-				//Animate the swap
-				this.sweet1.moveToPosition(this.sweet2.x,this.sweet2.y,5,0);
-				this.sweet2.moveToPosition(tempX,tempY,5,0);
-				
-				//Update the logical grid
-				//TODO
+				//Is the move even physically possible?
+				if(this.sweetGrid.moveIsPhysicallyPossible(this.sweet1.myKey,this.sweet2.myKey)){
+					
+					//OK, physically swap the pieces. This is just cosmetic to the user, we'll check for matches later.
+					this.sweet1.moveToPosition(this.sweet2.getOriginX(),this.sweet2.getOriginY(),5,0);
+					this.sweet2.moveToPosition(this.sweet1.getOriginX(),this.sweet1.getOriginY(),5,0);
+					
+					if(this.sweetGrid.moveIsLogicallyPossible(this.sweet1.myKey,this.sweet2.myKey)){
+						trace("Swap is logically possible.");
+					}else{
+						trace("Swap is not logically possible.");
+						//Swap the pieces back
+					}
+				}else{
+					trace("Move is not physically possible. Ignoring...");
+				}
 				
 				//Stop wiggling the chosen sweet
 				this.sweet1.stopWiggle();
 				
-				this.sweet1 = null;
-				this.sweet2 = null;
+				//OK, let the user provide input again.
+				this.gridInputAllowed = true;
 			}
 		}
-
 	}
 	
 }

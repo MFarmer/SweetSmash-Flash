@@ -8,13 +8,15 @@
 		private var originX:uint;
 		private var originY:uint;
 		public var defaultFrame:uint;
-		public var myIndex:uint;
+		public var myKey:String;
 		
-		public function Sweet(originX:uint,originY:uint,myGame:SweetSmash,myIndex:uint) {
+		public function Sweet(originX:uint,originY:uint,myGame:SweetSmash,key:String) {
 			// constructor code
 			this.animateSweet = this;
 			this.animateGame = myGame;
-			this.myIndex = myIndex;
+			
+			//Record the key associated with this sweet, example: row0col0.
+			this.myKey = key;
 			
 			this.originX = originX;
 			this.originY = originY;

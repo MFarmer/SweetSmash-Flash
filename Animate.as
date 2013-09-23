@@ -199,7 +199,7 @@
 			if(!this.explodeBlock){
 				this.explodeBlock = true;
 				for(var i:uint=0; i<this.explodeParticleCount; i++){
-					this.particleList.push(new Sweet(this.animateSweet.x,this.animateSweet.y,this.animateGame,0));
+					this.particleList.push(new Sweet(this.animateSweet.x,this.animateSweet.y,this.animateGame,""));
 					this.particleList[i].scaleX = 0.5;
 					this.particleList[i].scaleY = this.particleList[i].scaleX;
 					this.particleList[i].rotation = Math.floor(Math.random() * 360);
