@@ -2,10 +2,14 @@
 	import flash.events.Event;
 	import flash.display.MovieClip;
 	import flash.events.MouseEvent;
+	import flash.utils.Timer;
+	import flash.events.TimerEvent;
 	
 	public class Animate extends MovieClip{
 		public var animateSweet:Sweet;
 		public var animateGame:SweetSmash;
+		
+		private var myTimer:Timer;
 		
 		//Jiggle
 		private var leftJiggle:int;
@@ -195,7 +199,7 @@
 			if(!this.explodeBlock){
 				this.explodeBlock = true;
 				for(var i:uint=0; i<this.explodeParticleCount; i++){
-					this.particleList.push(new Sweet(this.animateSweet.x,this.animateSweet.y,this.animateGame));
+					this.particleList.push(new Sweet(this.animateSweet.x,this.animateSweet.y,this.animateGame,0));
 					this.particleList[i].scaleX = 0.5;
 					this.particleList[i].scaleY = this.particleList[i].scaleX;
 					this.particleList[i].rotation = Math.floor(Math.random() * 360);
@@ -265,22 +269,7 @@
 		//#########################
 		//#	Move To Position
 		//#########################
-		public function moveToPositionOnClick(destinationX:int,destinationY:int, speed:Number):void{
-			this.moveToDestinationX = destinationX;
-			this.moveToDestinationY = destinationY;
-			this.moveToMaxFrameCount = speed;
-			this.addEventListener(MouseEvent.MOUSE_DOWN,this.moveToPositionWasClicked);
-		}
-		
-		private function moveToPositionWasClicked(even:MouseEvent):void{
-			this.removeEventListener(MouseEvent.MOUSE_DOWN,this.moveToPositionWasClicked);
-			this.moveToPosition(this.moveToDestinationX,this.moveToDestinationY,this.moveToMaxFrameCount);
-		}
-		
-		public function moveToPosition(destinationX:int, destinationY:int, speed:Number):void{
-			//Block input while the move is occurring
-			this.animateGame.gridInputAllowed = false;
-			
+		public function moveToPosition(destinationX:int, destinationY:int, speed:Number,delay:uint):void{
 			this.moveToDestinationX = destinationX;
 			this.moveToDestinationY = destinationY;
 			this.moveToFrameCount = 0;
@@ -288,6 +277,13 @@
 			this.moveToStepX = (this.moveToDestinationX - this.x)/this.moveToMaxFrameCount;
 			this.moveToStepY = (this.moveToDestinationY - this.y)/this.moveToMaxFrameCount;
 			
+			this.myTimer = new Timer(delay,0);
+			this.myTimer.addEventListener(TimerEvent.TIMER,moveTo);
+			this.myTimer.start();
+		}
+		
+		private function moveTo(event:TimerEvent):void{
+			this.myTimer.removeEventListener(TimerEvent.TIMER,moveTo);
 			this.addEventListener(Event.ENTER_FRAME,performMoveToPosition);
 		}
 		
@@ -300,9 +296,6 @@
 				this.x = this.moveToDestinationX;
 				this.y = this.moveToDestinationY;
 				this.removeEventListener(Event.ENTER_FRAME,performMoveToPosition);
-				
-				//Move has completed
-				this.animateGame.gridInputAllowed = true;
 			}
 		}
 		

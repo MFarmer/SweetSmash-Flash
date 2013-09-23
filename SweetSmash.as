@@ -1,14 +1,18 @@
 ﻿package  {
 	import flash.display.MovieClip;
 	import flash.events.MouseEvent;
+	import flash.utils.Timer;
+	import flash.events.TimerEvent;
 	
 	public class SweetSmash extends MovieClip{
-
+		
 		private var topBar:TopBar = new TopBar();
 		private var kitchen:Kitchen = new Kitchen();
 		private var tileList:Array = new Array();
 
 		private var sweetList:Array = new Array();
+		
+		private var sweetGrid:Grid;
 		
 		//Keep track of whether input is allowed at the moment or not
 		public var gridInputAllowed:Boolean;
@@ -21,10 +25,14 @@
 		//#	Constructor
 		//#########################
 		public function SweetSmash() {
+
+			//Create the Grid of Sweets
+			this.sweetGrid = new Grid(this);
 			
-			//Don't allow input initially
-			this.gridInputAllowed = false;
+			//allow input initially?
+			this.gridInputAllowed = true;
 			
+			//Add 81 background tiles and the top bar (these are always static)
 			this.buildBackground();
 			
 			//Place kitchen
@@ -63,17 +71,21 @@
 		//#########################
 		private function buildInitialSweetGrid():void{
 			//Open the kitchen door
-			this.kitchen.openDoor(500);
+			this.kitchen.openDoor(1500);
+			
+			var moveToDelay:uint = 20;
 			
 			//Place sweets
+			var index = 0;
 			for(var i:uint=32; i<608; i+=64){
 				for(var j:uint=96; j<672; j+=64){
-					this.sweetList.push(new Sweet(i,j,this));
-					addChild(this.sweetList[this.sweetList.length-1]);
-					var mySweet = this.sweetList[this.sweetList.length-1];
 					
-					//Move the Sweet from the Kitchen to its Initial Position
-					mySweet.moveToPosition(mySweet.getOriginX(),mySweet.getOriginY(),20);
+					this.sweetGrid.addSweet(new Sweet(i,j,this,index++));
+					addChild(this.sweetGrid.getLastSweet());
+					
+					var mySweet = this.sweetGrid.getLastSweet();
+					mySweet.moveToPosition(mySweet.getOriginX(),mySweet.getOriginY(),20,moveToDelay);
+					moveToDelay += 20;
 					
 					//Setup all sweets to listen for mouse up/down (Drags)
 					mySweet.addEventListener(MouseEvent.MOUSE_DOWN,mySweet.wiggle);
@@ -89,12 +101,15 @@
 			if(this.sweet1 != null){
 				this.sweet2 = (event.target as Sweet);
 				
+				trace("Sweets at index "+this.sweet1.myIndex+" and "+this.sweet2.myIndex+" are swapping");
+				this.sweetGrid.swapLogicalSweet(this.sweet1.myIndex,this.sweet2.myIndex);
+				
 				var tempX = this.sweet1.x;
 				var tempY = this.sweet1.y;
 				
 				//Animate the swap
-				this.sweet1.moveToPosition(this.sweet2.x,this.sweet2.y,5);
-				this.sweet2.moveToPosition(tempX,tempY,5);
+				this.sweet1.moveToPosition(this.sweet2.x,this.sweet2.y,5,0);
+				this.sweet2.moveToPosition(tempX,tempY,5,0);
 				
 				//Update the logical grid
 				//TODO

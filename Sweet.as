@@ -8,11 +8,13 @@
 		private var originX:uint;
 		private var originY:uint;
 		public var defaultFrame:uint;
+		public var myIndex:uint;
 		
-		public function Sweet(originX:uint,originY:uint,myGame:SweetSmash) {
+		public function Sweet(originX:uint,originY:uint,myGame:SweetSmash,myIndex:uint) {
 			// constructor code
 			this.animateSweet = this;
 			this.animateGame = myGame;
+			this.myIndex = myIndex;
 			
 			this.originX = originX;
 			this.originY = originY;
@@ -30,6 +32,7 @@
 		public function getOriginY():uint{
 			return this.originY;
 		}
+		
 	}
 	
 }
