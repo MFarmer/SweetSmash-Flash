@@ -7,16 +7,12 @@
 
 		private var originX:uint;
 		private var originY:uint;
-		public var defaultFrame:uint;
-		public var myKey:String;
+		private var defaultFrame:uint;
 		
-		public function Sweet(originX:uint,originY:uint,myGame:SweetSmash,key:String) {
+		public function Sweet(originX:uint,originY:uint,myGame:SweetSmash) {
 			// constructor code
 			this.animateSweet = this;
 			this.animateGame = myGame;
-			
-			//Record the key associated with this sweet, example: row0col0.
-			this.myKey = key;
 			
 			this.originX = originX;
 			this.originY = originY;
@@ -35,6 +31,26 @@
 			return this.originY;
 		}
 		
+		public function getDefaultFrame():uint{
+			return this.defaultFrame;
+		}
+		
+		public function setOrigin(x:uint,y:uint):void{
+			this.originX = x;
+			this.originY = y;
+		}
+		
+		public function getKey():String{
+			var colNumber = (this.x - 32);
+			if(colNumber != 0){
+				colNumber /= 64;
+			}
+			var rowNumber = (this.y - 96);
+			if(rowNumber != 0){
+				rowNumber /= 64;
+			}
+			return "row"+rowNumber+"col"+colNumber;
+		}
 	}
 	
 }

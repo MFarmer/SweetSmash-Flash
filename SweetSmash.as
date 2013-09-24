@@ -48,7 +48,7 @@
 		//#	Print Cursor Position
 		//#########################
 		private function printCursorPosition(event:MouseEvent):void{
-			trace("Cursor Position: ("+this.mouseX+","+this.mouseY+")");
+			//trace("Cursor Position: ("+this.mouseX+","+this.mouseY+")");
 		}
 		
 		//#########################
@@ -82,7 +82,7 @@
 				for(var j:uint=96; j<672; j+=64){
 					
 					//1. Add the sweet to my dictionary
-					this.sweetGrid.grid["row"+rowNumber+"col"+colNumber] = new Sweet(i,j,this,"row"+rowNumber+"col"+colNumber);
+					this.sweetGrid.grid["row"+rowNumber+"col"+colNumber] = new Sweet(i,j,this);
 					addChild(this.sweetGrid.grid["row"+rowNumber+"col"+colNumber]);
 					
 					//Get ready to animate the sweet. It will shoot out from the kitchen to its initial grid position.
@@ -107,36 +107,42 @@
 		//#	Perform Swap
 		//#########################
 		private function performSwap(event:MouseEvent):void{
-			if(this.sweet1 != null){
+			this.sweet2 = (event.target as Sweet);
+			
+			if(this.sweet1 != null && this.sweet1 != this.sweet2){
 				
 				//Block user input until everything has been considered!
 				this.gridInputAllowed = false;
 				
-				this.sweet2 = (event.target as Sweet);
-				
 				//Is the move even physically possible?
-				if(this.sweetGrid.moveIsPhysicallyPossible(this.sweet1.myKey,this.sweet2.myKey)){
-					
-					//OK, physically swap the pieces. This is just cosmetic to the user, we'll check for matches later.
-					this.sweet1.moveToPosition(this.sweet2.getOriginX(),this.sweet2.getOriginY(),5,0);
-					this.sweet2.moveToPosition(this.sweet1.getOriginX(),this.sweet1.getOriginY(),5,0);
-					
-					if(this.sweetGrid.moveIsLogicallyPossible(this.sweet1.myKey,this.sweet2.myKey)){
+				if(this.sweetGrid.moveIsPhysicallyPossible(this.sweet1,this.sweet2)){
+
+					if(this.sweetGrid.moveIsLogicallyPossible(this.sweet1,this.sweet2)){
 						trace("Swap is logically possible.");
+						
+						//OK, physically swap the pieces. This is just cosmetic to the user, we'll check for matches later.
+						this.sweet1.moveToPosition(this.sweet2.x,this.sweet2.y,5,0);
+						this.sweet2.moveToPosition(this.sweet1.x,this.sweet1.y,5,0);
+						
+						//Show matched sweets
+						this.sweetGrid.showAllMatchedSweets();
 					}else{
 						trace("Swap is not logically possible.");
-						//Swap the pieces back
 					}
 				}else{
 					trace("Move is not physically possible. Ignoring...");
 				}
-				
-				//Stop wiggling the chosen sweet
-				this.sweet1.stopWiggle();
-				
 				//OK, let the user provide input again.
 				this.gridInputAllowed = true;
+			}else{
+				if(this.sweet1 != null){
+					//Tell me the info about this chosen sweet
+					trace("Sweet Info: defaultFrame="+this.sweet1.getDefaultFrame()+", key="+this.sweet1.getKey());
+				}
 			}
+			
+			//Stop wiggling the chosen sweet
+			this.sweet1.stopWiggle();
 		}
 	}
 	
