@@ -87,7 +87,7 @@
 					
 					//Get ready to animate the sweet. It will shoot out from the kitchen to its initial grid position.
 					var mySweet = this.sweetGrid.grid["row"+rowNumber+"col"+colNumber];
-					mySweet.moveToPosition(mySweet.getOriginX(),mySweet.getOriginY(),20,moveToDelay,"initializeGrid",162);
+					mySweet.moveToPosition(mySweet.getOriginX(),mySweet.getOriginY(),10,moveToDelay,"initializeGrid",162);
 					
 					//I want the sweets to shoot out one at a time at staggered intervals, so increase the delay for the next sweet.
 					moveToDelay += 20;

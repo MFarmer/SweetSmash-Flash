@@ -286,7 +286,7 @@
 					this.myGame.addChild(this.grid["row"+i+"col"+col]);
 					
 					var mySweet = this.grid["row"+i+"col"+col];
-					mySweet.moveToPosition(mySweet.getOriginX(),mySweet.getOriginY(),20,0,"initializeGrid",totalFreeSpaces);
+					mySweet.moveToPosition(mySweet.getOriginX(),mySweet.getOriginY(),10,0,"initializeGrid",totalFreeSpaces);
 					
 					//Setup all sweets to listen for mouse up/down (Drags)
 					mySweet.addEventListener(MouseEvent.MOUSE_DOWN,mySweet.wiggle);

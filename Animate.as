@@ -199,7 +199,8 @@
 			Animate.maxNumberOfSweetsToExplode = maxNumberOfSweetsToExplode;
 			Animate.explosionCount = 0;
 			this.explodeFrameCount = 0;
-			this.explodeMaxFrameCount = 60;
+			//this.explodeMaxFrameCount = 60;
+			this.explodeMaxFrameCount = 30;
 			this.explodeBlock = false;
 			this.explodeParticleCount = 10;
 			this.performExplode();
@@ -226,7 +227,7 @@
 					this.particleList[i].vectorY = Math.floor(Math.random() * 20 - 10);
 					this.particleList[i].startSpin(Math.floor(Math.random()*10),true);
 					this.particleList[i].startPulse(0.3,0.5,0.1);
-					this.particleList[i].startFade(60,true);
+					this.particleList[i].startFade(this.explodeMaxFrameCount,true);
 					this.particleList[i].mouseEnabled = false;
 					this.parent.addChild(this.particleList[i]);
 				}
