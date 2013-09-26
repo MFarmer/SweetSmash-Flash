@@ -16,6 +16,10 @@
 		private static var explosionCount:uint;
 		private static var maxNumberOfSweetsToExplode:uint;
 		private static var initializeGridCount:uint;
+		private static var moveDownCount:uint;
+		private static var expectedMoveDownCount:uint;
+		private static var totalToMove:uint;
+		private static var fillEmptySpotsCount:uint;
 		
 		//Jiggle
 		private var leftJiggle:int;
@@ -68,6 +72,7 @@
 		private var isMovingDown:Boolean;
 		private var moveDownSpeed:Number;
 		private var depthGoal:int;
+		private var moveDownCheck:String;
 		
 		//Wiggle
 		private var wiggleRotateLeft:Boolean;
@@ -285,6 +290,9 @@
 				if(Animate.explosionCount >= Animate.maxNumberOfSweetsToExplode){
 					//Explosions are done.
 					trace("Explosions are done!");
+					
+					//Settle the sweets
+					this.animateGame.sweetGrid.settleSweets();
 				}else{
 					trace("Explosions are not done! "+Animate.explosionCount+" < "+Animate.maxNumberOfSweetsToExplode);
 				}
@@ -319,9 +327,11 @@
 		//#########################
 		//#	Move To Position
 		//#########################
-		public function moveToPosition(destinationX:int, destinationY:int, speed:Number,delay:uint,nextAction:String):void{
+		public function moveToPosition(destinationX:int, destinationY:int, speed:Number,delay:uint,nextAction:String,totalToMove:uint):void{
 			Animate.swapCount = 0;
 			Animate.initializeGridCount = 0;
+			Animate.fillEmptySpotsCount = 0;
+			Animate.totalToMove = totalToMove;
 			this.moveToNextAction = nextAction;
 			this.moveToDestinationX = destinationX;
 			this.moveToDestinationY = destinationY;
@@ -353,14 +363,14 @@
 				
 				if(moveToNextAction == "showAllMatches"){
 					Animate.swapCount++;
-					if(Animate.swapCount == 2){
+					if(Animate.swapCount == Animate.totalToMove){
 						Animate.swapCount = 0;
 						this.animateGame.sweetGrid.showAllMatchedSweets();
 					}
 				}else if(moveToNextAction == "initializeGrid"){
 					Animate.initializeGridCount++;
-					trace("Sweet is ready! "+Animate.initializeGridCount+"/162");
-					if(Animate.initializeGridCount == 162){
+					trace("Sweet is ready! "+Animate.initializeGridCount+"/"+Animate.totalToMove);
+					if(Animate.initializeGridCount == Animate.totalToMove){
 						Animate.initializeGridCount = 0;
 						this.animateGame.sweetGrid.processMatches();
 					}
@@ -371,7 +381,10 @@
 		//#########################
 		//#	Move Down X Units of N Pixels
 		//#########################
-		public function moveDown(units:uint, pixels:uint, speed:Number){
+		public function moveDown(units:uint, pixels:uint, speed:Number,check:String,numberOfSweetsMovingDown:uint){
+			Animate.moveDownCount = 0;
+			this.moveDownCheck = check;
+			Animate.expectedMoveDownCount = numberOfSweetsMovingDown;
 			this.isMovingDown = true;
 			this.depthGoal = this.y + units * pixels;
 			this.moveDownSpeed = speed;
@@ -386,6 +399,19 @@
 					this.y = this.depthGoal;
 					this.isMovingDown = false;
 					this.removeEventListener(Event.ENTER_FRAME,performMoveDown);
+					
+					if(this.moveDownCheck == "settling"){
+						Animate.moveDownCount++;
+						
+						
+						if(Animate.moveDownCount == Animate.expectedMoveDownCount){
+							//All Sweets have moved down, and thus the new sweets are ready to be placed onto the grid
+							trace("Ready to place new sweets!");
+							this.animateGame.sweetGrid.placeNewSweets();
+						}else{
+							trace("Move Down not complete! "+Animate.moveDownCount+"/"+Animate.expectedMoveDownCount);
+						}
+					}
 				}
 			}
 		}

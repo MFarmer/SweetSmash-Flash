@@ -87,7 +87,7 @@
 					
 					//Get ready to animate the sweet. It will shoot out from the kitchen to its initial grid position.
 					var mySweet = this.sweetGrid.grid["row"+rowNumber+"col"+colNumber];
-					mySweet.moveToPosition(mySweet.getOriginX(),mySweet.getOriginY(),20,moveToDelay,"initializeGrid");
+					mySweet.moveToPosition(mySweet.getOriginX(),mySweet.getOriginY(),20,moveToDelay,"initializeGrid",162);
 					
 					//I want the sweets to shoot out one at a time at staggered intervals, so increase the delay for the next sweet.
 					moveToDelay += 20;
@@ -106,7 +106,7 @@
 		//#########################
 		//#	Perform Swap
 		//#########################
-		private function performSwap(event:MouseEvent):void{
+		public function performSwap(event:MouseEvent):void{
 			this.sweet2 = (event.target as Sweet);
 			
 			if(this.sweet1 != null && this.sweet1 != this.sweet2){
@@ -124,8 +124,8 @@
 						
 						var tempX = this.sweet1.x;
 						var tempY = this.sweet1.y;
-						this.sweet1.moveToPosition(this.sweet2.x,this.sweet2.y,5,0,"showAllMatches");
-						this.sweet2.moveToPosition(tempX,tempY,5,0,"showAllMatches");
+						this.sweet1.moveToPosition(this.sweet2.x,this.sweet2.y,5,0,"showAllMatches",2);
+						this.sweet2.moveToPosition(tempX,tempY,5,0,"showAllMatches",2);
 						
 						//Show matched sweets
 						//this.sweetGrid.showAllMatchedSweets();
@@ -143,7 +143,16 @@
 				if(this.sweet1 != null){
 					//Tell me the info about this chosen sweet
 					trace("Sweet Info: defaultFrame="+this.sweet1.getDefaultFrame()+", key="+this.sweet1.getKey());
-					
+					var myLocation:String = "";
+					for(var col:uint=0; col<9; col++){
+						for(var row:uint=0; row<9; row++){
+							if(this.sweetGrid.grid["row"+row+"col"+col] == this.sweet1){
+								myLocation = "row"+row+"col"+col;
+								break;
+							}
+						}
+					}
+					trace("I belong at the location this.sweetGrid["+myLocation+"]");
 					//Stop wiggling the chosen sweet
 					this.sweet1.stopWiggle();
 				}

@@ -1,5 +1,6 @@
 ﻿package  {
 	import flash.utils.Dictionary;
+	import flash.events.MouseEvent;
 	
 	public class Grid {
 
@@ -7,6 +8,7 @@
 		
 		private var tempGrid:Dictionary = new Dictionary();
 		private var matchBucket:Array = new Array();
+		private var freeSpacesPerColumn:Array = new Array();
 		
 		private var myGame:SweetSmash;
 		
@@ -52,8 +54,6 @@
 			//Copy over the current grid to the tempGrid
 			this.tempGrid = this.grid;
 			
-			this.printGrid(this.tempGrid);
-			
 			//Make the logical swap in the tempGrid			
 			var sweet1 = this.tempGrid[key1];
 			var sweet2 = this.tempGrid[key2];
@@ -63,8 +63,6 @@
 			
 			this.tempGrid[key1] = sweet2;
 			this.tempGrid[key2] = sweet1;
-			
-			this.printGrid(this.tempGrid);
 			
 			//I need to find all matches in my grid
 			this.findColMatches();
@@ -83,10 +81,13 @@
 		}
 		
 		public function processMatches():void{
+			this.matchBucket = new Array();
 			this.tempGrid = this.grid;
 			this.findColMatches();
 			this.findRowMatches();
-			this.showAllMatchedSweets();
+			if(this.matchBucket.length > 0){
+				this.showAllMatchedSweets();
+			}
 		}
 		
 		private function printGrid(x:Dictionary):void{
@@ -94,7 +95,11 @@
 			trace("-------------------------------------");
 			for(var row:uint=0; row<9; row++){
 				for(var col:uint=0; col<9; col++){
-					rowFrames += x["row"+row+"col"+col].getDefaultFrame();
+					if(x["row"+row+"col"+col]){
+						rowFrames += x["row"+row+"col"+col].getDefaultFrame();
+					}else{
+						rowFrames += " ";
+					}
 					rowFrames += " ";
 				}
 				trace(rowFrames);
@@ -167,7 +172,6 @@
 			if(matchStreak < 3){
 				var lastIndex:uint = this.matchBucket.length - 1;
 				for(var i:int=lastIndex; i>lastIndex-matchStreak; i--){
-					this.matchBucket[i].isMatched = false;
 					this.matchBucket.splice(i,1);
 				}
 			}else{
@@ -187,7 +191,7 @@
 			
 			while(startIndex <= endIndex){
 				currentKey = this.matchBucket[startIndex].getKey();
-				for(var j:uint=startIndex+1; j<endIndex; j++){
+				for(var j:uint=startIndex+1; j<=endIndex; j++){
 					if(currentKey == this.matchBucket[j].getKey()){
 						duplicateCount++;
 						purgeIndex.push(j);
@@ -204,9 +208,92 @@
 				this.matchBucket.splice(purgeIndex[i],1);
 			}
 			
+			//Begin the explosions. When the explosions end, sweets will settle.
 			for(i=0; i<this.matchBucket.length; i++){
+				this.matchBucket[i].isMatched = true;
 				this.matchBucket[i].startExplode(this.matchBucket.length);
 			}
+		}
+		
+		public function settleSweets():void{
+			trace("Settling muh sweets...");
+			
+			var emptySpaces:uint = 0;
+			var moveDownCount:uint = 0;
+			var sweetsToMoveDown:Array = new Array();
+			
+			this.freeSpacesPerColumn = new Array();
+			
+			//Plan on which sweets to move down and how far
+			for(var col:uint=0; col<9; col++){
+				for(var row:int=8; row>=0; row--){
+					if(this.grid["row"+row+"col"+col].isMatched){
+						emptySpaces++;
+					}else{
+						this.grid["row"+row+"col"+col].spacesToMoveDown = emptySpaces;
+						sweetsToMoveDown.push(this.grid["row"+row+"col"+col]);
+					}
+				}
+				this.freeSpacesPerColumn.push(emptySpaces);
+				emptySpaces = 0;
+			}
+			
+			//Actually move the sweets down
+			for(var i:uint=0; i<sweetsToMoveDown.length; i++){
+				//Update the physical grid
+				sweetsToMoveDown[i].moveDown(sweetsToMoveDown[i].spacesToMoveDown,64,20,"settling",sweetsToMoveDown.length);
+			}
+		}
+		
+		public function placeNewSweets():void{
+			trace("Placing new sweets!");
+			
+			//Refresh grid
+			var resetGrid:Dictionary = new Dictionary();
+			
+			for(var col:uint=0; col<9; col++){
+				for(var row:uint=0; row<9; row++){
+					if(!this.grid["row"+row+"col"+col].isMatched){
+						resetGrid[this.grid["row"+row+"col"+col].getKey()] = this.grid["row"+row+"col"+col];
+					}else{
+						trace("not including row"+row+"col"+col);
+					}
+				}
+			}
+			this.printGrid(resetGrid);
+			
+			//Erase the old grid
+			this.grid = new Dictionary();
+			//Copy the contents of the new grid into the official grid
+			this.grid = resetGrid;
+			
+			//Figure out where the empty spots are now
+			var totalFreeSpaces:uint = 0;
+			for(var j:uint=0; j<this.freeSpacesPerColumn.length; j++){
+				totalFreeSpaces += this.freeSpacesPerColumn[j];
+			}
+			
+			trace("There are "+totalFreeSpaces+" free spaces!");
+			
+			for(col=0; col<9; col++){
+				for(var i:uint=0; i<this.freeSpacesPerColumn[col]; i++){
+					//Record the location of this empty sweet
+					var newY:uint = (i*64)+96;
+					var newX:uint = (col*64)+32;
+					
+					//Replace the empty sweet with a new sweet
+					this.grid["row"+i+"col"+col] = new Sweet(newX,newY,this.myGame);
+					this.myGame.addChild(this.grid["row"+i+"col"+col]);
+					
+					var mySweet = this.grid["row"+i+"col"+col];
+					mySweet.moveToPosition(mySweet.getOriginX(),mySweet.getOriginY(),20,0,"initializeGrid",totalFreeSpaces);
+					
+					//Setup all sweets to listen for mouse up/down (Drags)
+					mySweet.addEventListener(MouseEvent.MOUSE_DOWN,mySweet.wiggle);
+					mySweet.addEventListener(MouseEvent.MOUSE_UP,this.myGame.performSwap);
+				}
+			}
+			
 		}
 	}
 	

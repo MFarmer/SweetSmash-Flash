@@ -8,10 +8,14 @@
 		private var originX:uint;
 		private var originY:uint;
 		private var defaultFrame:uint;
+		
+		//Helps during the settle sequence
 		public var isMatched:Boolean;
+		public var spacesToMoveDown:uint;
 		
 		public function Sweet(originX:uint,originY:uint,myGame:SweetSmash) {
 			this.isMatched = false;
+			this.spacesToMoveDown = 0;
 			// constructor code
 			this.animateSweet = this;
 			this.animateGame = myGame;
@@ -62,6 +66,22 @@
 				rowNumber /= 64;
 			}
 			return "row"+rowNumber+"col"+colNumber;
+		}
+		
+		public function getRow():uint{
+			var rowNumber = (this.y - 96);
+			if(rowNumber != 0){
+				rowNumber /= 64;
+			}
+			return rowNumber;
+		}
+		
+		public function getCol():uint{
+			var colNumber = (this.x - 32);
+			if(colNumber != 0){
+				colNumber /= 64;
+			}
+			return colNumber;
 		}
 	}
 	
