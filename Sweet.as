@@ -8,8 +8,10 @@
 		private var originX:uint;
 		private var originY:uint;
 		private var defaultFrame:uint;
+		public var isMatched:Boolean;
 		
 		public function Sweet(originX:uint,originY:uint,myGame:SweetSmash) {
+			this.isMatched = false;
 			// constructor code
 			this.animateSweet = this;
 			this.animateGame = myGame;
@@ -21,6 +23,11 @@
 			this.x = 707;
 			this.y = 261;
 			gotoAndStop(this.defaultFrame);
+		}
+		
+		public function setPosition(x:int,y:int):void{
+			this.x = x;
+			this.y = y;
 		}
 		
 		public function getOriginX():uint{
@@ -38,6 +45,11 @@
 		public function setOrigin(x:uint,y:uint):void{
 			this.originX = x;
 			this.originY = y;
+		}
+		
+		public function setDefaultFrame(frameIndex:uint):void{
+			this.defaultFrame = frameIndex;
+			gotoAndStop(this.defaultFrame);
 		}
 		
 		public function getKey():String{

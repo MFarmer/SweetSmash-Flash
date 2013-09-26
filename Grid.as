@@ -4,8 +4,9 @@
 	public class Grid {
 
 		public var grid:Dictionary = new Dictionary();
+		
 		private var tempGrid:Dictionary = new Dictionary();
-		private var matchBucket:Array;
+		private var matchBucket:Array = new Array();
 		
 		private var myGame:SweetSmash;
 		
@@ -81,6 +82,13 @@
 			}
 		}
 		
+		public function processMatches():void{
+			this.tempGrid = this.grid;
+			this.findColMatches();
+			this.findRowMatches();
+			this.showAllMatchedSweets();
+		}
+		
 		private function printGrid(x:Dictionary):void{
 			var rowFrames:String;
 			trace("-------------------------------------");
@@ -115,27 +123,19 @@
 					
 					if(matchStreak == 0){
 						frame = this.tempGrid["row"+row+"col"+col].getDefaultFrame();
-						//trace("row"+row+"col"+col+": Setting "+frame+" as the current frame to look for.");
 					}
 					
 					if(this.tempGrid["row"+row+"col"+col].getDefaultFrame() == frame){
 						matchStreak++;
 						this.matchBucket.push(this.tempGrid["row"+row+"col"+col]);
-						//trace("row"+row+"col"+col+": Match with current frame! Match streak is now "+matchStreak+", and Match Bucket length is now "+this.matchBucket.length+".");
 					}else{
-						//trace("row"+row+"col"+col+": Match not found, streak ended at "+matchStreak+".");
 						matchStreak = this.resetMatchStatus(matchStreak);
 						row--;
-						//trace("");
 					}
 				}
-				
 				matchStreak = this.resetMatchStatus(matchStreak);
 			}
 			
-			//trace("Done with findColMatches()");
-			//trace("--------------------------");
-			//trace("There were "+this.comboFound+" combos found!");
 		}
 		
 		private function findRowMatches():void{
@@ -148,27 +148,18 @@
 					
 					if(matchStreak == 0){
 						frame = this.tempGrid["row"+row+"col"+col].getDefaultFrame();
-						//trace("row"+row+"col"+col+": Setting "+frame+" as the current frame to look for.");
 					}
 					
-					if(this.tempGrid["row"+row+"col"+col].getDefaultFrame()== frame){
+					if(this.tempGrid["row"+row+"col"+col].getDefaultFrame() == frame){
 						matchStreak++;
 						this.matchBucket.push(this.tempGrid["row"+row+"col"+col]);
-						//trace("row"+row+"col"+col+": Match with current frame! Match streak is now "+matchStreak+", and Match Bucket length is now "+this.matchBucket.length+".");
 					}else{
-						//trace("row"+row+"col"+col+": Match not found, streak ended at "+matchStreak+".");
 						matchStreak = this.resetMatchStatus(matchStreak);
 						col--;
-						//trace("");
 					}
 				}
-				
 				matchStreak = this.resetMatchStatus(matchStreak);
 			}
-			
-			//trace("Done with findRowMatches()");
-			//trace("--------------------------");
-			//trace("There were "+this.comboFound+" combos found!");
 		}
 		
 		//Call when a match streak ends and the results need to be processed
@@ -176,10 +167,10 @@
 			if(matchStreak < 3){
 				var lastIndex:uint = this.matchBucket.length - 1;
 				for(var i:int=lastIndex; i>lastIndex-matchStreak; i--){
+					this.matchBucket[i].isMatched = false;
 					this.matchBucket.splice(i,1);
 				}
 			}else{
-				//trace("		[Combo was found!]");
 				this.comboFound++;
 			}
 			
@@ -187,10 +178,35 @@
 		}
 		
 		public function showAllMatchedSweets():void{
-			for(var i:uint=0; i<this.matchBucket.length; i++){
-				this.matchBucket[i].startBlink(5,20);
+			//Figure out how many unique sweets in the match bucket there are
+			var duplicateCount:uint = 0;
+			var endIndex:uint = this.matchBucket.length - 1;
+			var startIndex:uint = 0;
+			var currentKey:String;
+			var purgeIndex:Array = new Array();
+			
+			while(startIndex <= endIndex){
+				currentKey = this.matchBucket[startIndex].getKey();
+				for(var j:uint=startIndex+1; j<endIndex; j++){
+					if(currentKey == this.matchBucket[j].getKey()){
+						duplicateCount++;
+						purgeIndex.push(j);
+						break;
+					}
+				}
+				startIndex++;
 			}
-			this.matchBucket = new Array();
+			
+			trace("duplicateCount == "+duplicateCount);
+			
+			//Clean up the match bucket to remove duplicates
+			for(var i:uint=0; i<purgeIndex.length; i++){
+				this.matchBucket.splice(purgeIndex[i],1);
+			}
+			
+			for(i=0; i<this.matchBucket.length; i++){
+				this.matchBucket[i].startExplode(this.matchBucket.length);
+			}
 		}
 	}
 	

@@ -12,7 +12,7 @@
 
 		private var sweetList:Array = new Array();
 		
-		private var sweetGrid:Grid;
+		public var sweetGrid:Grid;
 		
 		//Keep track of whether input is allowed at the moment or not
 		public var gridInputAllowed:Boolean;
@@ -87,7 +87,7 @@
 					
 					//Get ready to animate the sweet. It will shoot out from the kitchen to its initial grid position.
 					var mySweet = this.sweetGrid.grid["row"+rowNumber+"col"+colNumber];
-					mySweet.moveToPosition(mySweet.getOriginX(),mySweet.getOriginY(),20,moveToDelay);
+					mySweet.moveToPosition(mySweet.getOriginX(),mySweet.getOriginY(),20,moveToDelay,"initializeGrid");
 					
 					//I want the sweets to shoot out one at a time at staggered intervals, so increase the delay for the next sweet.
 					moveToDelay += 20;
@@ -119,15 +119,20 @@
 
 					if(this.sweetGrid.moveIsLogicallyPossible(this.sweet1,this.sweet2)){
 						trace("Swap is logically possible.");
+						//Stop wiggling the chosen sweet
+						this.sweet1.stopWiggle();
 						
-						//OK, physically swap the pieces. This is just cosmetic to the user, we'll check for matches later.
-						this.sweet1.moveToPosition(this.sweet2.x,this.sweet2.y,5,0);
-						this.sweet2.moveToPosition(this.sweet1.x,this.sweet1.y,5,0);
+						var tempX = this.sweet1.x;
+						var tempY = this.sweet1.y;
+						this.sweet1.moveToPosition(this.sweet2.x,this.sweet2.y,5,0,"showAllMatches");
+						this.sweet2.moveToPosition(tempX,tempY,5,0,"showAllMatches");
 						
 						//Show matched sweets
-						this.sweetGrid.showAllMatchedSweets();
+						//this.sweetGrid.showAllMatchedSweets();
 					}else{
 						trace("Swap is not logically possible.");
+						//Stop wiggling the chosen sweet
+						this.sweet1.stopWiggle();
 					}
 				}else{
 					trace("Move is not physically possible. Ignoring...");
@@ -138,11 +143,11 @@
 				if(this.sweet1 != null){
 					//Tell me the info about this chosen sweet
 					trace("Sweet Info: defaultFrame="+this.sweet1.getDefaultFrame()+", key="+this.sweet1.getKey());
+					
+					//Stop wiggling the chosen sweet
+					this.sweet1.stopWiggle();
 				}
 			}
-			
-			//Stop wiggling the chosen sweet
-			this.sweet1.stopWiggle();
 		}
 	}
 	

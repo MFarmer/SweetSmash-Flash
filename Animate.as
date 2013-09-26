@@ -11,6 +11,12 @@
 		
 		private var myTimer:Timer;
 		
+		//Static
+		private static var swapCount:uint;
+		private static var explosionCount:uint;
+		private static var maxNumberOfSweetsToExplode:uint;
+		private static var initializeGridCount:uint;
+		
 		//Jiggle
 		private var leftJiggle:int;
 		private var rightJiggle:uint;
@@ -56,6 +62,7 @@
 		private var moveToStepY:Number;
 		private var moveToFrameCount:uint;
 		private var moveToMaxFrameCount:uint;
+		private var moveToNextAction:String;
 		
 		//Move Down
 		private var isMovingDown:Boolean;
@@ -179,27 +186,34 @@
 			this.explodeFrameCount = 0;
 			this.explodeMaxFrameCount = 60;
 			this.explodeBlock = false;
-			this.explodeParticleCount = 5;
+			this.explodeParticleCount = 10;
 			this.addEventListener(MouseEvent.MOUSE_DOWN,explode);
 		}
 		
-		public function startExplode():void{
+		public function startExplode(maxNumberOfSweetsToExplode:uint):void{
+			Animate.maxNumberOfSweetsToExplode = maxNumberOfSweetsToExplode;
+			Animate.explosionCount = 0;
 			this.explodeFrameCount = 0;
 			this.explodeMaxFrameCount = 60;
 			this.explodeBlock = false;
-			this.explodeParticleCount = 30;
+			this.explodeParticleCount = 10;
 			this.performExplode();
 		}
 		
 		private function performExplode():void{
-			//Remove the icon which was clicked
-			this.animateGame.removeChild(this.animateSweet);
+			var localX = this.animateSweet.x;
+			var localY = this.animateSweet.y;
+			var defaultFrame = this.animateSweet.getDefaultFrame();
+			
+			this.animateSweet.alpha = 0.0;
 			
 			//Place 10 items on the center of the clicked icon
 			if(!this.explodeBlock){
 				this.explodeBlock = true;
 				for(var i:uint=0; i<this.explodeParticleCount; i++){
-					this.particleList.push(new Sweet(this.animateSweet.x,this.animateSweet.y,this.animateGame));
+					this.particleList.push(new Sweet(localX,localY,this.animateGame));
+					this.particleList[i].setDefaultFrame(defaultFrame);
+					this.particleList[i].setPosition(localX,localY);
 					this.particleList[i].scaleX = 0.5;
 					this.particleList[i].scaleY = this.particleList[i].scaleX;
 					this.particleList[i].rotation = Math.floor(Math.random() * 360);
@@ -209,7 +223,7 @@
 					this.particleList[i].startPulse(0.3,0.5,0.1);
 					this.particleList[i].startFade(60,true);
 					this.particleList[i].mouseEnabled = false;
-					this.animateGame.addChild(this.particleList[i]);
+					this.parent.addChild(this.particleList[i]);
 				}
 				this.addEventListener(Event.ENTER_FRAME,animateExplode);
 			}else{
@@ -233,13 +247,48 @@
 			
 			if(this.explodeFrameCount >= this.explodeMaxFrameCount){
 				//Explosion has ended
-				for(i=0; i<this.particleList.length; i++){
-					this.animateGame.removeChild(this.particleList[i]);
-				}
-				this.particleList = new Array();
 				this.removeEventListener(Event.ENTER_FRAME,animateExplode);
+				
+				//Remove particles from the screen AND THEIR EVENT LISTENERS (crucial in order to not crash the program)
+				for(i=0; i<this.particleList.length; i++){
+					this.particleList[i].removeEventListener(Event.ENTER_FRAME,performFade);
+					this.particleList[i].removeEventListener(Event.ENTER_FRAME,performPulse);
+					this.particleList[i].removeEventListener(Event.ENTER_FRAME,performSpin);
+					
+					//Safely remove the explosion particles from the parent (should be the main stage)
+					if (this.particleList[i].parent) {
+						try {
+							this.particleList[i].parent.removeChild(this.particleList[i]);
+						}catch(err:Error){
+							// fail silently; child already removed
+							trace("particle list not removing");
+						}
+					}
+				}
+				
+				//Re-initialize explosion variables
+				this.particleList = new Array();
 				this.explodeFrameCount = 0;
 				this.explodeBlock = false;
+				
+				//Safely remove the sweet from the board.
+				if(this.parent){
+					try{
+						this.parent.removeChild(this);
+					}catch(err:Error){
+						trace("particle list not removing");
+					}
+				}
+				
+				Animate.explosionCount++;
+				
+				if(Animate.explosionCount >= Animate.maxNumberOfSweetsToExplode){
+					//Explosions are done.
+					trace("Explosions are done!");
+				}else{
+					trace("Explosions are not done! "+Animate.explosionCount+" < "+Animate.maxNumberOfSweetsToExplode);
+				}
+				
 			}
 			
 			this.explodeFrameCount++;
@@ -266,10 +315,14 @@
 				this.rotation -= 360;
 			}
 		}
+		
 		//#########################
 		//#	Move To Position
 		//#########################
-		public function moveToPosition(destinationX:int, destinationY:int, speed:Number,delay:uint):void{
+		public function moveToPosition(destinationX:int, destinationY:int, speed:Number,delay:uint,nextAction:String):void{
+			Animate.swapCount = 0;
+			Animate.initializeGridCount = 0;
+			this.moveToNextAction = nextAction;
 			this.moveToDestinationX = destinationX;
 			this.moveToDestinationY = destinationY;
 			this.moveToFrameCount = 0;
@@ -296,6 +349,22 @@
 				this.x = this.moveToDestinationX;
 				this.y = this.moveToDestinationY;
 				this.removeEventListener(Event.ENTER_FRAME,performMoveToPosition);
+				
+				
+				if(moveToNextAction == "showAllMatches"){
+					Animate.swapCount++;
+					if(Animate.swapCount == 2){
+						Animate.swapCount = 0;
+						this.animateGame.sweetGrid.showAllMatchedSweets();
+					}
+				}else if(moveToNextAction == "initializeGrid"){
+					Animate.initializeGridCount++;
+					trace("Sweet is ready! "+Animate.initializeGridCount+"/162");
+					if(Animate.initializeGridCount == 162){
+						Animate.initializeGridCount = 0;
+						this.animateGame.sweetGrid.processMatches();
+					}
+				}
 			}
 		}
 		
