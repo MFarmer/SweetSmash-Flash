@@ -71,7 +71,7 @@
 			//** The Match Bucket is now filled with all sweets which are involved in a match **
 			//The aforementioned functions placed match keys into the matchBucket. If key1 and/or key2 are in the matchBucket, the move is logically possible.
 			if(this.keyIsInMatchBucket(key1) || this.keyIsInMatchBucket(key2)){
-				//move is logically sound. Allow it!
+				
 				this.grid = this.tempGrid;
 				
 				return true;
@@ -87,6 +87,10 @@
 			this.findRowMatches();
 			if(this.matchBucket.length > 0){
 				this.showAllMatchedSweets();
+			}else{
+				//USER INPUT WILL BE RE-ENABLED BECAUSE THERE ARE NO MATCHES TO AUTO-EXPLODE.
+				//this.myGame.gridInputAllowed = true;
+				this.myGame.gridInputLight.setEnabled(true);
 			}
 		}
 		
@@ -274,6 +278,7 @@
 			}
 			
 			trace("There are "+totalFreeSpaces+" free spaces!");
+			this.myGame.kitchen.openDoor(500);//door will close when this function ends regardless I believe, so better to set too long than too short
 			
 			for(col=0; col<9; col++){
 				for(var i:uint=0; i<this.freeSpacesPerColumn[col]; i++){
@@ -286,7 +291,7 @@
 					this.myGame.addChild(this.grid["row"+i+"col"+col]);
 					
 					var mySweet = this.grid["row"+i+"col"+col];
-					mySweet.moveToPosition(mySweet.getOriginX(),mySweet.getOriginY(),10,0,"initializeGrid",totalFreeSpaces);
+					mySweet.moveToPosition(mySweet.getOriginX(),mySweet.getOriginY(),10,0,"processMatches",totalFreeSpaces);
 					
 					//Setup all sweets to listen for mouse up/down (Drags)
 					mySweet.addEventListener(MouseEvent.MOUSE_DOWN,mySweet.wiggle);

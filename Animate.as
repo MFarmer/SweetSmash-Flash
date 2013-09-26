@@ -368,7 +368,7 @@
 						Animate.swapCount = 0;
 						this.animateGame.sweetGrid.showAllMatchedSweets();
 					}
-				}else if(moveToNextAction == "initializeGrid"){
+				}else if(moveToNextAction == "processMatches"){
 					Animate.initializeGridCount++;
 					trace("Sweet is ready! "+Animate.initializeGridCount+"/"+Animate.totalToMove);
 					if(Animate.initializeGridCount == Animate.totalToMove){
@@ -421,7 +421,7 @@
 		//#	Wiggle
 		//#########################
 		public function wiggle(event:MouseEvent):void{
-			if(this.animateGame.gridInputAllowed){
+			if(this.animateGame.gridInputLight.isEnabled()){
 				this.startWiggle();
 				
 				//Record which sweet is currently chosen

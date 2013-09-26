@@ -7,15 +7,15 @@
 	public class SweetSmash extends MovieClip{
 		
 		private var topBar:TopBar = new TopBar();
-		private var kitchen:Kitchen = new Kitchen();
+		public var kitchen:Kitchen = new Kitchen();
 		private var tileList:Array = new Array();
+		
+		//Controls whether the user can interact with the grid or not at various times
+		public var gridInputLight:ToggleLight;
 
 		private var sweetList:Array = new Array();
 		
 		public var sweetGrid:Grid;
-		
-		//Keep track of whether input is allowed at the moment or not
-		public var gridInputAllowed:Boolean;
 		
 		//Keep track of sweets to swap
 		public var sweet1:Sweet;
@@ -29,11 +29,12 @@
 			//Create the Grid of Sweets
 			this.sweetGrid = new Grid(this);
 			
-			//allow input initially?
-			this.gridInputAllowed = true;
-			
 			//Add 81 background tiles and the top bar (these are always static)
 			this.buildBackground();
+			
+			//Draw input light to tell user when input is or is not allowed
+			this.gridInputLight = new ToggleLight(200,15);
+			addChild(this.gridInputLight);
 			
 			//Place kitchen
 			addChild(this.kitchen);
@@ -41,7 +42,7 @@
 			this.buildInitialSweetGrid();
 			
 			//Debugging
-			this.addEventListener(MouseEvent.MOUSE_DOWN,printCursorPosition);
+			//this.addEventListener(MouseEvent.MOUSE_DOWN,printCursorPosition);
 		}
 		
 		//#########################
@@ -87,7 +88,7 @@
 					
 					//Get ready to animate the sweet. It will shoot out from the kitchen to its initial grid position.
 					var mySweet = this.sweetGrid.grid["row"+rowNumber+"col"+colNumber];
-					mySweet.moveToPosition(mySweet.getOriginX(),mySweet.getOriginY(),10,moveToDelay,"initializeGrid",162);
+					mySweet.moveToPosition(mySweet.getOriginX(),mySweet.getOriginY(),10,moveToDelay,"processMatches",162);
 					
 					//I want the sweets to shoot out one at a time at staggered intervals, so increase the delay for the next sweet.
 					moveToDelay += 20;
@@ -107,28 +108,29 @@
 		//#	Perform Swap
 		//#########################
 		public function performSwap(event:MouseEvent):void{
+			if(!this.gridInputLight.isEnabled()){
+				trace("Ignoring swap request because input is disabled.");
+				return;
+			}
+			
 			this.sweet2 = (event.target as Sweet);
 			
 			if(this.sweet1 != null && this.sweet1 != this.sweet2){
-				
-				//Block user input until everything has been considered!
-				this.gridInputAllowed = false;
 				
 				//Is the move even physically possible?
 				if(this.sweetGrid.moveIsPhysicallyPossible(this.sweet1,this.sweet2)){
 
 					if(this.sweetGrid.moveIsLogicallyPossible(this.sweet1,this.sweet2)){
+
+						this.gridInputLight.setEnabled(false);
+						
 						trace("Swap is logically possible.");
-						//Stop wiggling the chosen sweet
 						this.sweet1.stopWiggle();
 						
 						var tempX = this.sweet1.x;
 						var tempY = this.sweet1.y;
 						this.sweet1.moveToPosition(this.sweet2.x,this.sweet2.y,5,0,"showAllMatches",2);
 						this.sweet2.moveToPosition(tempX,tempY,5,0,"showAllMatches",2);
-						
-						//Show matched sweets
-						//this.sweetGrid.showAllMatchedSweets();
 					}else{
 						trace("Swap is not logically possible.");
 						//Stop wiggling the chosen sweet
@@ -137,8 +139,6 @@
 				}else{
 					trace("Move is not physically possible. Ignoring...");
 				}
-				//OK, let the user provide input again.
-				this.gridInputAllowed = true;
 			}else{
 				if(this.sweet1 != null){
 					//Tell me the info about this chosen sweet
