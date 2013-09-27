@@ -260,6 +260,8 @@
 					if(!this.grid["row"+row+"col"+col].isMatched){
 						resetGrid[this.grid["row"+row+"col"+col].getKey()] = this.grid["row"+row+"col"+col];
 					}else{
+						this.grid["row"+row+"col"+col].removeEventListener(MouseEvent.MOUSE_DOWN,this.grid["row"+row+"col"+col].wiggle);
+						this.grid["row"+row+"col"+col].removeEventListener(MouseEvent.MOUSE_UP,this.myGame.performSwap);
 						trace("not including row"+row+"col"+col);
 					}
 				}
@@ -267,9 +269,11 @@
 			this.printGrid(resetGrid);
 			
 			//Erase the old grid
+			this.grid = null;
 			this.grid = new Dictionary();
 			//Copy the contents of the new grid into the official grid
 			this.grid = resetGrid;
+			resetGrid = null;
 			
 			//Figure out where the empty spots are now
 			var totalFreeSpaces:uint = 0;

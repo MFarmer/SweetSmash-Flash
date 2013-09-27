@@ -89,75 +89,6 @@
 		}
 		
 		//#########################
-		//#	Jiggle
-		//#########################
-		public function startJiggle(deltaLeft:uint,deltaRight:uint):void{
-			this.isJiggling = true;
-			this.leftJiggle = this.x - deltaLeft;
-			this.rightJiggle = this.x + deltaRight;
-			this.movingLeft = false;
-			this.addEventListener(Event.ENTER_FRAME,performJiggle);
-		}
-		
-		public function stopJiggle():void{
-			if(this.isJiggling){
-				this.removeEventListener(Event.ENTER_FRAME,performJiggle);
-			}else{
-				trace("Error: Sweet is not jiggling, therefore the 'stopJiggling' call was ignored.");
-			}
-		}
-
-		private function performJiggle(event:Event):void{
-			if(this.movingLeft){
-				if(this.x > this.leftJiggle){
-					this.x--;
-				}else{
-					this.movingLeft = false;
-				}
-			}else{
-				if(this.x < this.rightJiggle){
-					this.x++;
-				}else{
-					this.movingLeft = true;
-				}
-			}
-		}
-		
-		//#########################
-		//#	Blink
-		//#########################
-		public function startBlink(blinkPhaseFrameCount:uint,blinkIterationCount:uint):void{
-			this.blinkTotalFrameCount = 0;
-			this.blinkPhaseFrameCount = blinkPhaseFrameCount;
-			this.blinkIterationCount = blinkIterationCount;
-			this.blinkOn = false;
-			
-			this.addEventListener(Event.ENTER_FRAME,performBlink);
-		}
-		
-		private function performBlink(event:Event):void{
-			if(this.blinkOn){
-				//this.alpha = 1.0;
-				this.visible = true;
-			}else{
-				//this.alpha = 0.0;
-				this.visible = false;
-			}
-			
-			if(this.blinkTotalFrameCount % this.blinkPhaseFrameCount == 0){
-				//A phase has ended, so flip the blinkOn variable.
-				this.blinkOn = !this.blinkOn;
-			}
-			
-			if(this.blinkTotalFrameCount >= (this.blinkPhaseFrameCount * this.blinkIterationCount)){
-				this.visible = true;
-				this.removeEventListener(Event.ENTER_FRAME,performBlink);
-			}
-			
-			this.blinkTotalFrameCount++;
-		}
-		
-		//#########################
 		//#	Fade
 		//#########################
 		public function startFade(fadeMaxFrameCount:uint,fadeOut:Boolean):void{
@@ -225,9 +156,9 @@
 					this.particleList[i].rotation = Math.floor(Math.random() * 360);
 					this.particleList[i].vectorX = Math.floor(Math.random() * 20 - 10);
 					this.particleList[i].vectorY = Math.floor(Math.random() * 20 - 10);
-					this.particleList[i].startSpin(Math.floor(Math.random()*10),true);
-					this.particleList[i].startPulse(0.3,0.5,0.1);
-					this.particleList[i].startFade(this.explodeMaxFrameCount,true);
+					//this.particleList[i].startSpin(Math.floor(Math.random()*10),true);
+					//this.particleList[i].startPulse(0.3,0.5,0.1);
+					//this.particleList[i].startFade(this.explodeMaxFrameCount,true);
 					this.particleList[i].mouseEnabled = false;
 					this.parent.addChild(this.particleList[i]);
 				}
@@ -273,7 +204,7 @@
 				}
 				
 				//Re-initialize explosion variables
-				this.particleList = new Array();
+				this.particleList = null;
 				this.explodeFrameCount = 0;
 				this.explodeBlock = false;
 				
@@ -341,13 +272,12 @@
 			this.moveToStepX = (this.moveToDestinationX - this.x)/this.moveToMaxFrameCount;
 			this.moveToStepY = (this.moveToDestinationY - this.y)/this.moveToMaxFrameCount;
 			
-			this.myTimer = new Timer(delay,0);
-			this.myTimer.addEventListener(TimerEvent.TIMER,moveTo);
-			this.myTimer.start();
+			this.moveTo();
 		}
 		
-		private function moveTo(event:TimerEvent):void{
-			this.myTimer.removeEventListener(TimerEvent.TIMER,moveTo);
+		private function moveTo():void{
+			//this.myTimer.removeEventListener(TimerEvent.TIMER,moveTo);
+			//this.myTimer = null;
 			this.addEventListener(Event.ENTER_FRAME,performMoveToPosition);
 		}
 		
