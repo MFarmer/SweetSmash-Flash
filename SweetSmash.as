@@ -119,7 +119,7 @@
 				
 				//Is the move even physically possible?
 				if(this.sweetGrid.moveIsPhysicallyPossible(this.sweet1,this.sweet2)){
-
+					
 					if(this.sweetGrid.moveIsLogicallyPossible(this.sweet1,this.sweet2)){
 
 						this.gridInputLight.setEnabled(false);

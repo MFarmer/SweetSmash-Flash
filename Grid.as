@@ -43,6 +43,9 @@
 			return result;
 		}
 		
+		//############################################################
+		//# Move is Logically Possible
+		//############################################################
 		public function moveIsLogicallyPossible(s1:Sweet,s2:Sweet):Boolean{
 			
 			var key1 = s1.getKey();
@@ -76,6 +79,15 @@
 				
 				return true;
 			}else{
+				sweet1 = this.tempGrid[key1];
+				sweet2 = this.tempGrid[key2];
+			
+				delete this.tempGrid[key1];
+				delete this.tempGrid[key2];
+			
+				this.tempGrid[key1] = sweet2;
+				this.tempGrid[key2] = sweet1;
+				
 				return false;
 			}
 		}
@@ -185,37 +197,37 @@
 			return 0;
 		}
 		
+		//http://stackoverflow.com/questions/2386781/get-size-of-actionscript-3-dictionary/2386847#2386847
+		public static function countKeys(myDictionary:flash.utils.Dictionary):int 
+		{
+			var n:int = 0;
+			for (var key:* in myDictionary) {
+				n++;
+			}
+			return n;
+		}
+		
 		public function showAllMatchedSweets():void{
 			//Figure out how many unique sweets in the match bucket there are
-			var duplicateCount:uint = 0;
-			var endIndex:uint = this.matchBucket.length - 1;
-			var startIndex:uint = 0;
-			var currentKey:String;
-			var purgeIndex:Array = new Array();
-			
-			while(startIndex <= endIndex){
-				currentKey = this.matchBucket[startIndex].getKey();
-				for(var j:uint=startIndex+1; j<=endIndex; j++){
-					if(currentKey == this.matchBucket[j].getKey()){
-						duplicateCount++;
-						purgeIndex.push(j);
-						break;
-					}
+			var uniqueSweet:Dictionary = new Dictionary();
+			trace("ShowAllMatchedSweets:");
+			trace("~~~~~~~~~~~~~~~~~~~~~");
+			for(var i:uint=0; i<this.matchBucket.length; i++){
+				if(!uniqueSweet[this.matchBucket[i].getKey()]){
+					trace(this.matchBucket[i].getKey()+": Unique. I will explode this sweet.");
+					uniqueSweet[this.matchBucket[i].getKey()] = this.matchBucket[i];
+					trace(this.matchBucket[i].getKey()+": ALREADY ACCOUNTED FOR, I will not explode it again.");
+				}else{
+					trace(this.matchBucket[i].getKey()+": ALREADY ACCOUNTED FOR, I will not explode it again.");
 				}
-				startIndex++;
 			}
+			trace("~~~~~~~~~~~~~~~~~~~~~");
 			
-			trace("duplicateCount == "+duplicateCount);
-			
-			//Clean up the match bucket to remove duplicates
-			for(var i:uint=0; i<purgeIndex.length; i++){
-				this.matchBucket.splice(purgeIndex[i],1);
-			}
-			
+			var uniqueSweetCount = countKeys(uniqueSweet);
 			//Begin the explosions. When the explosions end, sweets will settle.
-			for(i=0; i<this.matchBucket.length; i++){
+			for(var i:uint=0; i<this.matchBucket.length; i++){
 				this.matchBucket[i].isMatched = true;
-				this.matchBucket[i].startExplode(this.matchBucket.length);
+				this.matchBucket[i].startExplode(uniqueSweetCount);
 			}
 		}
 		
@@ -262,7 +274,7 @@
 					}else{
 						this.grid["row"+row+"col"+col].removeEventListener(MouseEvent.MOUSE_DOWN,this.grid["row"+row+"col"+col].wiggle);
 						this.grid["row"+row+"col"+col].removeEventListener(MouseEvent.MOUSE_UP,this.myGame.performSwap);
-						trace("not including row"+row+"col"+col);
+						trace("not including row"+row+"col"+col+"in the new resetGrid because this sweet was matched");
 					}
 				}
 			}
