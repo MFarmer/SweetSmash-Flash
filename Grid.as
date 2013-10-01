@@ -15,10 +15,16 @@
 		//Stat Counters
 		private var comboFound:uint = 0;
 		
+		//############################################################
+		//# Constructor
+		//############################################################
 		public function Grid(myGame:SweetSmash) {
 			this.myGame = myGame;
 		}
 		
+		//############################################################
+		//# Move is Physically Possible
+		//############################################################
 		public function moveIsPhysicallyPossible(s1:Sweet,s2:Sweet):Boolean{
 			var key1 = s1.getKey();
 			var key2 = s2.getKey();
@@ -92,6 +98,9 @@
 			}
 		}
 		
+		//############################################################
+		//# Process Matches
+		//############################################################
 		public function processMatches():void{
 			this.matchBucket = new Array();
 			this.tempGrid = this.grid;
@@ -106,6 +115,9 @@
 			}
 		}
 		
+		//############################################################
+		//# Print Grid
+		//############################################################
 		private function printGrid(x:Dictionary):void{
 			var rowFrames:String;
 			trace("-------------------------------------");
@@ -123,7 +135,10 @@
 			}
 			trace("-------------------------------------");
 		}
-		
+
+		//############################################################
+		//# Key is in Match Bucket
+		//############################################################
 		private function keyIsInMatchBucket(key:String):Boolean{
 			for(var i:uint=0; i<this.matchBucket.length; i++){
 				if(this.grid[key] == this.matchBucket[i]){
@@ -134,6 +149,9 @@
 			return false;
 		}
 		
+		//############################################################
+		//# Find Column Matches
+		//############################################################
 		private function findColMatches():void{
 			var frame:uint;
 			var matchStreak:uint = 0;
@@ -159,6 +177,9 @@
 			
 		}
 		
+		//############################################################
+		//# Find Row Matches
+		//############################################################
 		private function findRowMatches():void{
 			var frame:uint;
 			var matchStreak:uint = 0;
@@ -183,6 +204,9 @@
 			}
 		}
 		
+		//############################################################
+		//# Reset Match Status
+		//############################################################
 		//Call when a match streak ends and the results need to be processed
 		private function resetMatchStatus(matchStreak):uint{
 			if(matchStreak < 3){
@@ -197,6 +221,9 @@
 			return 0;
 		}
 		
+		//############################################################
+		//# Count Keys
+		//############################################################
 		//http://stackoverflow.com/questions/2386781/get-size-of-actionscript-3-dictionary/2386847#2386847
 		public static function countKeys(myDictionary:flash.utils.Dictionary):int 
 		{
@@ -207,6 +234,9 @@
 			return n;
 		}
 		
+		//############################################################
+		//# Show All Matched Sweets
+		//############################################################
 		public function showAllMatchedSweets():void{
 			//Figure out how many unique sweets in the match bucket there are
 			var uniqueSweet:Dictionary = new Dictionary();
@@ -225,12 +255,18 @@
 			
 			var uniqueSweetCount = countKeys(uniqueSweet);
 			//Begin the explosions. When the explosions end, sweets will settle.
-			for(var i:uint=0; i<this.matchBucket.length; i++){
+			for(i=0; i<this.matchBucket.length; i++){
 				this.matchBucket[i].isMatched = true;
 				this.matchBucket[i].startExplode(uniqueSweetCount);
 			}
+			
+			//For each match, add 25 pts to the scoreboard
+			this.myGame.scoreBoard.updateScore(25*this.matchBucket.length);
 		}
 		
+		//############################################################
+		//# Settle Sweets
+		//############################################################
 		public function settleSweets():void{
 			trace("Settling muh sweets...");
 			
@@ -261,6 +297,9 @@
 			}
 		}
 		
+		//############################################################
+		//# Place New Sweets
+		//############################################################
 		public function placeNewSweets():void{
 			trace("Placing new sweets!");
 			

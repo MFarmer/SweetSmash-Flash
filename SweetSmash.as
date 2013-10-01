@@ -3,6 +3,7 @@
 	import flash.events.MouseEvent;
 	import flash.utils.Timer;
 	import flash.events.TimerEvent;
+	import flash.text.TextField;
 	
 	public class SweetSmash extends MovieClip{
 		
@@ -12,7 +13,11 @@
 		
 		//Controls whether the user can interact with the grid or not at various times
 		public var gridInputLight:ToggleLight;
-
+		
+		//Scoreboard
+		public var scoreBoard:HUDInfoText = new HUDInfoText(0,"Score",500,9);
+		public var movesRemaining:HUDInfoText = new HUDInfoText(50,"Moves Left:",700,9);
+		
 		private var sweetList:Array = new Array();
 		
 		public var sweetGrid:Grid;
@@ -35,6 +40,10 @@
 			//Draw input light to tell user when input is or is not allowed
 			this.gridInputLight = new ToggleLight(200,15);
 			addChild(this.gridInputLight);
+			
+			//Draw the Score
+			addChild(this.scoreBoard);
+			addChild(this.movesRemaining);
 			
 			//Place kitchen
 			addChild(this.kitchen);
@@ -131,6 +140,8 @@
 						var tempY = this.sweet1.y;
 						this.sweet1.moveToPosition(this.sweet2.x,this.sweet2.y,5,0,"showAllMatches",2);
 						this.sweet2.moveToPosition(tempX,tempY,5,0,"showAllMatches",2);
+						
+						this.movesRemaining.updateScore(-1);
 					}else{
 						trace("Swap is not logically possible.");
 						//Stop wiggling the chosen sweet

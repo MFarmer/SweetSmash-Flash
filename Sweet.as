@@ -2,6 +2,7 @@
 	import flash.display.MovieClip;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
+	import flash.text.*;
 	
 	public class Sweet extends Animate{
 
@@ -23,7 +24,6 @@
 			this.originX = originX;
 			this.originY = originY;
 			this.defaultFrame = Math.floor(Math.random() * 5+1);
-			
 			this.x = 707;
 			this.y = 261;
 			gotoAndStop(this.defaultFrame);

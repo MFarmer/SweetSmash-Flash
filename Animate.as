@@ -115,6 +115,11 @@
 			}
 		}
 		
+		private function stopFade():void{
+			this.removeEventListener(Event.ENTER_FRAME,performFade);
+			trace("Stopped fade...");
+		}
+		
 		//#########################
 		//#	Explode on Mouse Event
 		//#########################
@@ -133,7 +138,7 @@
 			//this.explodeMaxFrameCount = 60;
 			this.explodeMaxFrameCount = 30;
 			this.explodeBlock = false;
-			this.explodeParticleCount = 10;
+			this.explodeParticleCount = 25;
 			this.performExplode();
 		}
 		
@@ -142,21 +147,24 @@
 			var localY = this.animateSweet.y;
 			var defaultFrame = this.animateSweet.getDefaultFrame();
 			
-			this.animateSweet.alpha = 0.0;
+			//this.animateSweet.alpha = 0.0;
+			//Show the package image
+			this.gotoAndStop(6);
 			
 			//Place 10 items on the center of the clicked icon
 			if(!this.explodeBlock){
 				this.explodeBlock = true;
 				for(var i:uint=0; i<this.explodeParticleCount; i++){
-					this.particleList.push(new Sweet(localX,localY,this.animateGame));
-					this.particleList[i].setDefaultFrame(defaultFrame);
-					this.particleList[i].setPosition(localX,localY);
-					this.particleList[i].scaleX = 0.5;
+					//this.particleList.push(new Sweet(localX,localY,this.animateGame));
+					this.particleList.push(new Particle(localX,localY));
+					//this.particleList[i].setDefaultFrame(defaultFrame);
+					//this.particleList[i].setPosition(localX,localY);
+					this.particleList[i].scaleX = Math.random()/2;
 					this.particleList[i].scaleY = this.particleList[i].scaleX;
 					this.particleList[i].rotation = Math.floor(Math.random() * 360);
 					this.particleList[i].vectorX = Math.floor(Math.random() * 20 - 10);
 					this.particleList[i].vectorY = Math.floor(Math.random() * 20 - 10);
-					//this.particleList[i].startSpin(Math.floor(Math.random()*10),true);
+					//this.particleList[i].startSpin(Math.floor(Math.random()*50),true);
 					//this.particleList[i].startPulse(0.3,0.5,0.1);
 					//this.particleList[i].startFade(this.explodeMaxFrameCount,true);
 					this.particleList[i].mouseEnabled = false;
@@ -188,9 +196,9 @@
 				
 				//Remove particles from the screen AND THEIR EVENT LISTENERS (crucial in order to not crash the program)
 				for(i=0; i<this.particleList.length; i++){
-					this.particleList[i].removeEventListener(Event.ENTER_FRAME,performFade);
-					this.particleList[i].removeEventListener(Event.ENTER_FRAME,performPulse);
-					this.particleList[i].removeEventListener(Event.ENTER_FRAME,performSpin);
+					//this.particleList[i].stopFade();
+					//this.particleList[i].stopPulse();
+					//this.particleList[i].stopSpin();
 					
 					//Safely remove the explosion particles from the parent (should be the main stage)
 					if (this.particleList[i].parent) {
@@ -254,6 +262,11 @@
 			if(this.rotation >= 360){
 				this.rotation -= 360;
 			}
+		}
+		
+		private function stopSpin():void{
+			this.addEventListener(Event.ENTER_FRAME,performSpin);
+			trace("Stopped spin...");
 		}
 		
 		//#########################
@@ -426,6 +439,11 @@
 				}
 			}
 			this.scaleY = this.scaleX;
+		}
+		
+		private function stopPulse():void{
+			this.removeEventListener(Event.ENTER_FRAME,performPulse);
+			trace("Stopping pulse...");
 		}
 	}
 	
