@@ -5,10 +5,10 @@
 	
 	public class HUDInfoText extends TextField{
 
-		private var scoreValue:uint;
+		private var scoreValue:int;
 		private var prefixString:String;
 		
-		public function HUDInfoText(value:uint,prefixString:String,xPos:int,yPos:int) {
+		public function HUDInfoText(value:int,prefixString:String,xPos:int,yPos:int) {
 			// constructor code
 			this.x = xPos;
 			this.y = yPos;
@@ -24,7 +24,7 @@
 			
 			this.refreshScore();
 		}
-		public function updateScore(x:uint):void{
+		public function updateScore(x:int):void{
 			this.scoreValue += x;
 			this.refreshScore();
 		}

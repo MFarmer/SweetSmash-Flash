@@ -9,6 +9,7 @@
 		private var tempGrid:Dictionary = new Dictionary();
 		private var matchBucket:Array = new Array();
 		private var freeSpacesPerColumn:Array = new Array();
+		private var specialBucket:Array = new Array();
 		
 		private var myGame:SweetSmash;
 		
@@ -59,6 +60,7 @@
 			
 			//Re-initialize a new, empty matchBucket
 			this.matchBucket = new Array();
+			this.specialBucket = new Array();
 			
 			//Copy over the current grid to the tempGrid
 			this.tempGrid = this.grid;
@@ -216,6 +218,11 @@
 				}
 			}else{
 				this.comboFound++;
+				if(matchStreak >= 4){
+					//Mark the sweet in the middle of this 4-5 combo as a special jelly bean.
+					var s:Sweet = this.matchBucket[this.matchBucket.length-3];
+					this.specialBucket.push(s.getKey());
+				}
 			}
 			
 			return 0;
@@ -262,6 +269,16 @@
 			
 			//For each match, add 25 pts to the scoreboard
 			this.myGame.scoreBoard.updateScore(25*this.matchBucket.length);
+		}
+		//############################################################
+		//# Place Special Sweets
+		//############################################################	
+		public function placeSpecialSweets():void{
+			for(var i:uint=0; i<this.specialBucket.length; i++){
+				this.grid[this.specialBucket[i]].isMatched = false;
+				this.grid[this.specialBucket[i]].setDefaultFrame(7);
+				this.grid[this.specialBucket[i]].startPulse(0.8,1.2,0.1);
+			}
 		}
 		
 		//############################################################
@@ -341,8 +358,8 @@
 					var newY:uint = (i*64)+96;
 					var newX:uint = (col*64)+32;
 					
-					//Replace the empty sweet with a new sweet
-					this.grid["row"+i+"col"+col] = new Sweet(newX,newY,this.myGame);
+					//Replace the empty sweet with a new sweet. Also check to see if this sweet should be special
+					this.grid["row"+i+"col"+col] = new Sweet(newX,newY,this.myGame);					
 					this.myGame.addChild(this.grid["row"+i+"col"+col]);
 					
 					var mySweet = this.grid["row"+i+"col"+col];
@@ -354,6 +371,8 @@
 				}
 			}
 			
+			//Show the special sweets
+			this.placeSpecialSweets();
 		}
 	}
 	
