@@ -8,28 +8,41 @@
 		private var scoreValue:int;
 		private var prefixString:String;
 		
-		public function HUDInfoText(value:int,prefixString:String,xPos:int,yPos:int) {
+		public function HUDInfoText(value:int,prefixString:String,fontSize:uint,xPos:int,yPos:int) {
 			// constructor code
 			this.x = xPos;
 			this.y = yPos;
 			this.scoreValue = value;
+			this.prefixString = prefixString;
 			this.autoSize = "left";
-			this.prefixString = prefixString
-			this.defaultTextFormat = new TextFormat('Verdana',32,0xFFFFFF);
+			this.defaultTextFormat = new TextFormat('Hobo Std',fontSize,0xFFFFFF);
 
+			this.applyShadowFilter();
+			
+			this.refreshText();
+		}
+		public function updateText(x:int):void{
+			this.scoreValue += x;
+			this.refreshText();
+		}
+		public function refreshText():void{
+			this.text = this.prefixString+" "+this.scoreValue;
+		}
+		public function getValue():int{
+			return this.scoreValue;
+		}
+		public function updatePrefix(x:String):void{
+			this.prefixString = x;
+		}
+		public function resetValue(x:int):void{
+			this.scoreValue = x;
+		}
+		
+		public function applyShadowFilter():void{
 			var shadowEffect:DropShadowFilter = new DropShadowFilter();
 			shadowEffect.angle = 45;
 			shadowEffect.distance = 3;
 			this.filters = [shadowEffect];
-			
-			this.refreshScore();
-		}
-		public function updateScore(x:int):void{
-			this.scoreValue += x;
-			this.refreshScore();
-		}
-		public function refreshScore():void{
-			this.text = this.prefixString+" "+this.scoreValue;
 		}
 
 	}

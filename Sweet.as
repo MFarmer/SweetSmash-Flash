@@ -13,9 +13,11 @@
 		//Helps during the settle sequence
 		public var isMatched:Boolean;
 		public var spacesToMoveDown:uint;
+		public var isSuperSpecial:Boolean;
 		
 		public function Sweet(originX:uint,originY:uint,myGame:SweetSmash) {
 			this.isMatched = false;
+			this.isSuperSpecial = false;
 			this.spacesToMoveDown = 0;
 			// constructor code
 			this.animateSweet = this;

@@ -1,6 +1,8 @@
 ﻿package  {
 	import flash.utils.Dictionary;
 	import flash.events.MouseEvent;
+	import flash.filters.BitmapFilterQuality; 
+	import flash.filters.BlurFilter; 
 	
 	public class Grid {
 
@@ -10,17 +12,52 @@
 		private var matchBucket:Array = new Array();
 		private var freeSpacesPerColumn:Array = new Array();
 		private var specialBucket:Array = new Array();
-		
+		private var superSpecialBucket:Array = new Array();
+		private var sawSuperSpecialInActiveMatch:Boolean;
 		private var myGame:SweetSmash;
 		
 		//Stat Counters
 		private var comboFound:uint = 0;
+		private var currentComboStreak:uint = 0;
+		public var longestComboStreak:uint = 0;
 		
 		//############################################################
 		//# Constructor
 		//############################################################
 		public function Grid(myGame:SweetSmash) {
 			this.myGame = myGame;
+			this.sawSuperSpecialInActiveMatch = false;
+		}
+		
+		//############################################################
+		//# Clean Grid
+		//############################################################
+		public function cleanGrid():void{
+			for(var row:uint=0; row<9; row++){
+				for(var col:uint=0; col<9; col++){
+					this.grid["row"+row+"col"+col].removeEventListener(MouseEvent.MOUSE_DOWN,this.grid["row"+row+"col"+col].wiggle);
+					this.grid["row"+row+"col"+col].removeEventListener(MouseEvent.MOUSE_UP,this.myGame.performSwap);
+					this.myGame.removeChild(this.grid["row"+row+"col"+col]);
+					delete this.grid["row"+row+"col"+col];
+				}
+			}
+			this.grid = null;
+			this.tempGrid = null;
+			this.matchBucket = null;
+			this.freeSpacesPerColumn = null;
+			this.specialBucket = null;
+			this.superSpecialBucket = null;
+			this.comboFound = 0;
+			this.currentComboStreak = 0;
+			this.longestComboStreak = 0;
+			
+			this.grid = new Dictionary();
+			this.tempGrid = new Dictionary();
+			this.matchBucket = new Array();
+			this.freeSpacesPerColumn = new Array();
+			this.specialBucket = new Array();
+			this.superSpecialBucket = new Array();
+			this.sawSuperSpecialInActiveMatch = false;
 		}
 		
 		//############################################################
@@ -61,6 +98,7 @@
 			//Re-initialize a new, empty matchBucket
 			this.matchBucket = new Array();
 			this.specialBucket = new Array();
+			this.superSpecialBucket = new Array();
 			
 			//Copy over the current grid to the tempGrid
 			this.tempGrid = this.grid;
@@ -84,7 +122,7 @@
 			if(this.keyIsInMatchBucket(key1) || this.keyIsInMatchBucket(key2)){
 				
 				this.grid = this.tempGrid;
-				
+				this.currentComboStreak++;
 				return true;
 			}else{
 				sweet1 = this.tempGrid[key1];
@@ -105,16 +143,62 @@
 		//############################################################
 		public function processMatches():void{
 			this.matchBucket = new Array();
+			this.specialBucket = new Array();
+			this.superSpecialBucket = new Array();
 			this.tempGrid = this.grid;
+			
 			this.findColMatches();
 			this.findRowMatches();
+			
 			if(this.matchBucket.length > 0){
+				this.currentComboStreak++;
 				this.showAllMatchedSweets();
 			}else{
 				//USER INPUT WILL BE RE-ENABLED BECAUSE THERE ARE NO MATCHES TO AUTO-EXPLODE.
-				//this.myGame.gridInputAllowed = true;
-				this.myGame.gridInputLight.setEnabled(true);
+				if(this.currentComboStreak > this.longestComboStreak){
+					this.longestComboStreak = this.currentComboStreak;
+				}
+				this.currentComboStreak = 0;
+				
+				if(this.myGame.movesRemaining.getValue() > 0){
+					this.myGame.gridInputLight.setEnabled(true);
+				}else{
+					trace("Game Over!");
+					this.myGame.addChild(this.myGame.recapBoard);
+					this.myGame.recapBoard.startFade(20,false);
+					this.myGame.recapBoard.beginRecap();
+					
+					//Blur all symbols on board
+					this.blurGame(new Array(new BlurFilter(10,10,1)));
+				}
 			}
+		}
+		
+		//############################################################
+		//# Blur Game (To un-blur game, send it an empty array
+		//############################################################
+		public function blurGame(blurEffect:Array):void{
+
+			//Blur the sweets
+			for(var row:uint=0; row<9; row++){
+				for(var col:uint=0; col<9; col++){
+					this.grid["row"+row+"col"+col].filters = blurEffect;
+				}
+			}
+			//Blur the tiles
+			for(var i:uint=0; i<this.myGame.tileGrid.length; i++){
+				this.myGame.tileGrid[i].filters = blurEffect;
+			}
+			//Blur the kitchen
+			this.myGame.kitchen.filters = blurEffect;
+			//Blur the topbar
+			this.myGame.topBar.filters = blurEffect;
+			//Blur the grid input light
+			this.myGame.gridInputLight.filters = blurEffect;
+			//Blur the hud textfields
+			this.myGame.scoreBoard.filters = blurEffect;
+			this.myGame.timeElapsed.filters = blurEffect;
+			this.myGame.movesRemaining.filters = blurEffect;
 		}
 		
 		//############################################################
@@ -168,6 +252,9 @@
 					
 					if(this.tempGrid["row"+row+"col"+col].getDefaultFrame() == frame){
 						matchStreak++;
+						if(this.tempGrid["row"+row+"col"+col].isSuperSpecial){
+							this.sawSuperSpecialInActiveMatch = true;
+						}
 						this.matchBucket.push(this.tempGrid["row"+row+"col"+col]);
 					}else{
 						matchStreak = this.resetMatchStatus(matchStreak);
@@ -196,6 +283,9 @@
 					
 					if(this.tempGrid["row"+row+"col"+col].getDefaultFrame() == frame){
 						matchStreak++;
+						if(this.tempGrid["row"+row+"col"+col].isSuperSpecial){
+							this.sawSuperSpecialInActiveMatch = true;
+						}
 						this.matchBucket.push(this.tempGrid["row"+row+"col"+col]);
 					}else{
 						matchStreak = this.resetMatchStatus(matchStreak);
@@ -218,13 +308,49 @@
 				}
 			}else{
 				this.comboFound++;
+				//Find opportunities for special sweets
 				if(matchStreak >= 4){
 					//Mark the sweet in the middle of this 4-5 combo as a special jelly bean.
-					var s:Sweet = this.matchBucket[this.matchBucket.length-3];
-					this.specialBucket.push(s.getKey());
+					if(this.myGame.sweet1 && this.myGame.sweet2){
+						if(this.keyIsInMatchBucket(this.myGame.sweet1.getKey())){
+							//Sweet1 succeeded in a match
+							this.specialBucket.push(this.myGame.sweet1.getKey());
+						}else{
+							this.specialBucket.push(this.myGame.sweet2.getKey());
+						}
+					}
+				}
+				if(this.sawSuperSpecialInActiveMatch){
+					//Wow! Blow up the entire board.
+					for(var l:uint=0; l<9; l++){
+						for(var m:uint=0; m<9; m++){
+							//Reset all super special sweets since they are about to be blown up
+							if(this.tempGrid["row"+l+"col"+m].isSuperSpecial){
+								this.tempGrid["row"+l+"col"+m].isSuperSpecial = false;
+							}
+							this.matchBucket.push(this.tempGrid["row"+l+"col"+m]);
+						}
+					}
+				}else if(this.matchBucket[this.matchBucket.length-1].getDefaultFrame() == 7){
+					this.superSpecialBucket.push(this.matchBucket[this.matchBucket.length-2].getKey());
+					this.specialBucket.push(this.matchBucket[this.matchBucket.length-2].getKey());
+					
+					var colNumber:uint = this.matchBucket[this.matchBucket.length-1].getCol();
+					if(this.matchBucket[this.matchBucket.length-1].getCol() == this.matchBucket[this.matchBucket.length-2].getCol()){
+						//Put the entire column into the  matchbucket
+						for(var j:uint=0; j<9; j++){
+							this.matchBucket.push(this.tempGrid["row"+j+"col"+colNumber]);
+						}
+					}else{
+						//Put the entire row into the matchbucket
+						var rowNumber:uint = this.matchBucket[this.matchBucket.length-1].getRow();
+						for(var k:uint=0; k<9; k++){
+							this.matchBucket.push(this.tempGrid["row"+rowNumber+"col"+k]);
+						}
+					}
 				}
 			}
-			
+			this.sawSuperSpecialInActiveMatch = false;
 			return 0;
 		}
 		
@@ -268,8 +394,9 @@
 			}
 			
 			//For each match, add 25 pts to the scoreboard
-			this.myGame.scoreBoard.updateScore(25*this.matchBucket.length);
+			this.myGame.scoreBoard.updateText(25*this.matchBucket.length);
 		}
+		
 		//############################################################
 		//# Place Special Sweets
 		//############################################################	
@@ -277,7 +404,11 @@
 			for(var i:uint=0; i<this.specialBucket.length; i++){
 				this.grid[this.specialBucket[i]].isMatched = false;
 				this.grid[this.specialBucket[i]].setDefaultFrame(7);
-				this.grid[this.specialBucket[i]].startPulse(0.8,1.2,0.1);
+				//this.grid[this.specialBucket[i]].startPulse(0.8,1.2,0.1);
+			}
+			for(i=0; i<this.superSpecialBucket.length; i++){
+				this.grid[this.superSpecialBucket[i]].isSuperSpecial = true;
+				this.grid[this.superSpecialBucket[i]].startPulse(0.8,1.2,0.1);
 			}
 		}
 		
@@ -308,9 +439,14 @@
 			}
 			
 			//Actually move the sweets down
-			for(var i:uint=0; i<sweetsToMoveDown.length; i++){
-				//Update the physical grid
-				sweetsToMoveDown[i].moveDown(sweetsToMoveDown[i].spacesToMoveDown,64,20,"settling",sweetsToMoveDown.length);
+			if(sweetsToMoveDown.length > 0){
+				for(var i:uint=0; i<sweetsToMoveDown.length; i++){
+					//Update the physical grid
+					sweetsToMoveDown[i].moveDown(sweetsToMoveDown[i].spacesToMoveDown,64,20,"settling",sweetsToMoveDown.length);
+				}
+			}else{
+				//In the event the entire board was cleared, there will be no sweets to move down, so go ahead and just place new sweets.
+				this.placeNewSweets();
 			}
 		}
 		
