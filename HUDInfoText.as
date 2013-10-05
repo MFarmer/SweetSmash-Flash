@@ -36,6 +36,7 @@
 		}
 		public function resetValue(x:int):void{
 			this.scoreValue = x;
+			this.refreshText();
 		}
 		
 		public function applyShadowFilter():void{

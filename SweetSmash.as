@@ -10,14 +10,13 @@
 		
 		public var topBar:TopBar = new TopBar();
 		public var kitchen:Kitchen = new Kitchen();
-		//private var tileList:Array = new Array();
 		
 		//Controls whether the user can interact with the grid or not at various times
 		public var gridInputLight:ToggleLight;
 		
 		//Scoreboard
 		public var scoreBoard:HUDInfoText = new HUDInfoText(0,"SCORE",32,15,16);
-		public var movesRemaining:HUDInfoText = new HUDInfoText(10,"MOVES LEFT",32,690,16);
+		public var movesRemaining:HUDInfoText = new HUDInfoText(1,"MOVES LEFT",32,690,16);
 		public var timeElapsed:HUDInfoText = new HUDInfoText(0,"ELAPSED TIME",32,275,16);
 		
 		//End of Game UI
@@ -42,7 +41,7 @@
 			//Create the Grid of Sweets.
 			this.sweetGrid = new Grid(this);
 			this.recapBoard = new Recap(this);
-			this.mainMenu = new MainMenu(this);
+			//this.mainMenu = new MainMenu(this);
 			
 			//Add 81 background tiles and the top bar (these are always static)
 			this.buildBackground();
@@ -102,21 +101,21 @@
 		//# Show Main Menu
 		//#########################
 		public function showMainMenu():void{
-			//this.addChild(this.mainMenu());
 			this.buildInitialSweetGrid("");
 			this.sweetGrid.blurGame(new Array(new BlurFilter(10,10,1)));
-			this.mainMenu.addEventListener(MouseEvent.MOUSE_DOWN,this.startGame);
-			this.addChild(this.mainMenu);
+			trace("About to build main menu");
+			this.mainMenu = new MainMenu(this);
+			trace("Finished building main menu");
 		}
 		
-		private function startGame(event:MouseEvent):void{
+		public function startGame():void{
 			this.sweetGrid.blurGame(new Array());
 			this.scoreBoard.applyShadowFilter();
 			this.movesRemaining.applyShadowFilter();
 			this.timeElapsed.applyShadowFilter();
-			this.mainMenu.removeEventListener(MouseEvent.MOUSE_DOWN,this.startGame);
-			this.removeChild(this.mainMenu);
-			this.buildInitialSweetGrid("processMatches");
+			//this.removeChild(this.mainMenu);
+			this.mainMenu.cleanup();
+			this.sweetGrid.processMatches();
 		}
 		
 		//#########################
@@ -125,10 +124,11 @@
 		public function buildInitialSweetGrid(followupFunctionName:String):void{
 			
 			if(this.sweetGrid.grid["row0col0"]){
+				trace("Resetting grid!");
 				this.movesRemaining.resetValue(10);
 				this.timeElapsed.resetValue(0);
 				this.scoreBoard.resetValue(0);
-				//this.removeChild(this.recapBoard);
+				this.removeChild(this.recapBoard);
 				this.recapBoard = null;
 				this.recapBoard = new Recap(this);
 				this.sweetGrid.blurGame(new Array());

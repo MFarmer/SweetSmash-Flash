@@ -162,7 +162,7 @@
 		private function startNewGame(event:MouseEvent):void{
 			this.removeAllTextFields();
 			this.removeEventListener(MouseEvent.MOUSE_DOWN,this.startNewGame);
-			this.animateGame.buildInitialSweetGrid("processMathces");
+			this.animateGame.buildInitialSweetGrid("processMatches");
 		}
 		
 		private function removeAllTextFields():void{

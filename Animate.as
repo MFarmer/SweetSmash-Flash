@@ -441,8 +441,10 @@
 			this.scaleY = this.scaleX;
 		}
 		
-		private function stopPulse():void{
+		public function stopPulse():void{
 			this.removeEventListener(Event.ENTER_FRAME,performPulse);
+			this.scaleX = 1;
+			this.scaleY = 1;
 			trace("Stopping pulse...");
 		}
 	}
