@@ -164,9 +164,11 @@
 					this.particleList[i].rotation = Math.floor(Math.random() * 360);
 					this.particleList[i].vectorX = Math.floor(Math.random() * 20 - 10);
 					this.particleList[i].vectorY = Math.floor(Math.random() * 20 - 10);
-					//this.particleList[i].startSpin(Math.floor(Math.random()*50),true);
-					//this.particleList[i].startPulse(0.3,0.5,0.1);
-					//this.particleList[i].startFade(this.explodeMaxFrameCount,true);
+					
+					/*this.particleList[i].startSpin(Math.floor(Math.random()*50),true);
+					this.particleList[i].startPulse(0.3,0.5,0.1);
+					this.particleList[i].startFade(this.explodeMaxFrameCount,true);*/
+					
 					this.particleList[i].mouseEnabled = false;
 					this.parent.addChild(this.particleList[i]);
 				}
@@ -196,9 +198,9 @@
 				
 				//Remove particles from the screen AND THEIR EVENT LISTENERS (crucial in order to not crash the program)
 				for(i=0; i<this.particleList.length; i++){
-					//this.particleList[i].stopFade();
-					//this.particleList[i].stopPulse();
-					//this.particleList[i].stopSpin();
+					/*this.particleList[i].stopFade();
+					this.particleList[i].stopPulse();
+					this.particleList[i].stopSpin();*/
 					
 					//Safely remove the explosion particles from the parent (should be the main stage)
 					if (this.particleList[i].parent) {

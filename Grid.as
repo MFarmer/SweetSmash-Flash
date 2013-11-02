@@ -3,6 +3,11 @@
 	import flash.events.MouseEvent;
 	import flash.filters.BitmapFilterQuality; 
 	import flash.filters.BlurFilter; 
+    import flash.utils.Timer;
+    import flash.events.TimerEvent;
+    import flash.media.Sound;
+    import flash.net.URLRequest;
+    import flash.net.URLLoader;
 	
 	public class Grid {
 
@@ -16,6 +21,12 @@
 		private var sawSuperSpecialInActiveMatch:Boolean;
 		private var myGame:SweetSmash;
 		
+		//Sound effects
+		private var explode1Sound:Sound;
+		private var explode11Sound:Sound;
+		private var explode2Sound:Sound;
+		private var explode3Sound:Sound;
+		
 		//Stat Counters
 		private var comboFound:uint = 0;
 		private var currentComboStreak:uint = 0;
@@ -25,6 +36,11 @@
 		//# Constructor
 		//############################################################
 		public function Grid(myGame:SweetSmash) {
+			//Setup sound effects
+			this.explode1Sound = new Sound(new URLRequest("sound/explode1.mp3"));
+			this.explode11Sound = new Sound(new URLRequest("sound/explode1-1.mp3"));
+			this.explode2Sound = new Sound(new URLRequest("sound/explode4.mp3"));
+			this.explode3Sound = new Sound(new URLRequest("sound/explode3.mp3"));
 			this.myGame = myGame;
 			this.sawSuperSpecialInActiveMatch = false;
 		}
@@ -392,6 +408,22 @@
 			for(i=0; i<this.matchBucket.length; i++){
 				this.matchBucket[i].isMatched = true;
 				this.matchBucket[i].startExplode(uniqueSweetCount);
+			}
+			
+			//Play explosion sound effect
+			if(this.matchBucket.length < 5){
+				if(Math.floor(Math.random() * 2)){
+					this.explode1Sound.play();
+				}else{
+					this.explode11Sound.play();
+				}
+			}else if(this.matchBucket.length < 10){
+				this.explode1Sound.play();
+				this.explode2Sound.play();
+			}else{
+				this.explode1Sound.play();
+				this.explode2Sound.play();
+				this.explode3Sound.play();
 			}
 			
 			//For each match, add 25 pts to the scoreboard

@@ -5,6 +5,8 @@
 	import flash.events.TimerEvent;
 	import flash.text.TextField;
 	import flash.filters.BlurFilter;
+	import flash.media.Sound;
+	import flash.net.URLRequest;
 	
 	public class SweetSmash extends MovieClip{
 		
@@ -16,8 +18,12 @@
 		
 		//Scoreboard
 		public var scoreBoard:HUDInfoText = new HUDInfoText(0,"SCORE",32,15,16);
-		public var movesRemaining:HUDInfoText = new HUDInfoText(1,"MOVES LEFT",32,690,16);
+		public var movesRemaining:HUDInfoText = new HUDInfoText(5,"MOVES LEFT",32,690,16);
 		public var timeElapsed:HUDInfoText = new HUDInfoText(0,"ELAPSED TIME",32,275,16);
+		
+		//Sound Effect
+		public var swapSound:Sound;
+		public var badSwapSound:Sound;
 		
 		//Help Button
 		public var helpButton:MenuButton;
@@ -45,6 +51,10 @@
 			this.sweetGrid = new Grid(this);
 			this.recapBoard = new Recap(this);
 			//this.mainMenu = new MainMenu(this);
+			
+			//Setup sound effects
+			this.swapSound = new Sound(new URLRequest("sound/swap.mp3"));
+			this.badSwapSound = new Sound(new URLRequest("sound/badswap.mp3"));
 			
 			//Add 81 background tiles and the top bar (these are always static)
 			this.buildBackground();
@@ -142,7 +152,7 @@
 			
 			if(this.sweetGrid.grid["row0col0"]){
 				trace("Resetting grid!");
-				this.movesRemaining.resetValue(10);
+				this.movesRemaining.resetValue(5);
 				this.timeElapsed.resetValue(0);
 				this.scoreBoard.resetValue(0);
 				this.removeChild(this.recapBoard);
@@ -210,6 +220,7 @@
 						this.helpButton.visible = false;
 						
 						trace("Swap is logically possible.");
+						this.swapSound.play();
 						this.sweet1.stopWiggle();
 						
 						var tempX = this.sweet1.x;
@@ -222,9 +233,11 @@
 						trace("Swap is not logically possible.");
 						//Stop wiggling the chosen sweet
 						this.sweet1.stopWiggle();
+						this.badSwapSound.play();
 					}
 				}else{
 					trace("Move is not physically possible. Ignoring...");
+					this.badSwapSound.play();
 				}
 			}else{
 				if(this.sweet1 != null){

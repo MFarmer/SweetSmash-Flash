@@ -5,6 +5,8 @@
 	import flash.events.MouseEvent;
 	import flash.text.TextFormat;
 	import flash.filters.DropShadowFilter;
+	import flash.media.Sound;
+	import flash.net.URLRequest;
 	
 	public class Recap extends Animate{
 		
@@ -17,6 +19,10 @@
 		private var comboLabel:TextField = new TextField();
 		private var finalScoreLabel:TextField = new TextField();
 		
+		//Sound Effects
+		private var pointSound:Sound;
+		private var soundCounter:uint;
+		
 		private var timer:Timer;
 		
 		//Remember values
@@ -25,6 +31,9 @@
 		private var longestCombo:uint;
 		
 		public function Recap(myGame:SweetSmash) {
+			this.pointSound = new Sound(new URLRequest("sound/beep.mp3"));
+			this.soundCounter = 0;
+			
 			this.animateGame = myGame;
 			this.x = 960/2 - this.width/2;
 			this.y = 320 - this.height/2;
@@ -96,6 +105,15 @@
 					this.animateGame.scoreBoard.updateText(-(this.finalScore - this.scoreField.getValue()));
 				}else{
 					this.scoreField.updateText(pointIncrement);
+					//Play point sound
+					if(this.soundCounter == 0){
+						this.pointSound.play();
+						this.soundCounter++;
+					}else if(this.soundCounter >= 15){
+							this.soundCounter = 0;
+					}else{
+						this.soundCounter++;
+					}
 					this.animateGame.scoreBoard.updateText(-pointIncrement);
 				}
 				this.scoreField.updatePrefix("+");
