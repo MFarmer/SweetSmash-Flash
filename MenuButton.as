@@ -2,11 +2,11 @@
 	import flash.events.MouseEvent;
 	public class MenuButton extends Animate {
 
-		public function MenuButton(defaultFrame:uint) {
+		public function MenuButton(defaultFrame:uint,xPos:int,yPos:int) {
 			// constructor code
 			trace("1");
-			this.x = 960/2;
-			this.y = 320;
+			this.x = xPos;
+			this.y = yPos;
 			this.gotoAndStop(defaultFrame);
 			trace("2");
 			this.addEventListener(MouseEvent.MOUSE_OVER,this.mouseIsHoveringOverMe);

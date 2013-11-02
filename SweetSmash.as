@@ -19,6 +19,9 @@
 		public var movesRemaining:HUDInfoText = new HUDInfoText(1,"MOVES LEFT",32,690,16);
 		public var timeElapsed:HUDInfoText = new HUDInfoText(0,"ELAPSED TIME",32,275,16);
 		
+		//Help Button
+		public var helpButton:MenuButton;
+		
 		//End of Game UI
 		public var recapBoard:Recap;
 		public var mainMenu:MainMenu;
@@ -68,6 +71,9 @@
 			//this.addEventListener(MouseEvent.MOUSE_DOWN,printCursorPosition);
 		}
 		
+		//#########################
+		//# Timer Triggered
+		//#########################
 		private function timerTriggered(event:TimerEvent):void{
 			if(this.movesRemaining.getValue() > 0 && this.gridInputLight.isEnabled()){
 				this.timeElapsed.updateText(1);
@@ -78,7 +84,7 @@
 		//#	Print Cursor Position
 		//#########################
 		private function printCursorPosition(event:MouseEvent):void{
-			//trace("Cursor Position: ("+this.mouseX+","+this.mouseY+")");
+			trace("Cursor Position: ("+this.mouseX+","+this.mouseY+")");
 		}
 		
 		//#########################
@@ -109,12 +115,23 @@
 		}
 		
 		public function startGame():void{
-			this.sweetGrid.blurGame(new Array());
+			this.sweetGrid.blurGame(new Array());//essentially 'unblurs' the game because I'm not sending a blurfilter in the array
 			this.scoreBoard.applyShadowFilter();
 			this.movesRemaining.applyShadowFilter();
 			this.timeElapsed.applyShadowFilter();
 			//this.removeChild(this.mainMenu);
 			this.mainMenu.cleanup();
+			this.helpButton = new MenuButton(6,845,575);
+			this.helpButton.addEventListener(MouseEvent.MOUSE_DOWN,this.mainMenu.remindHowToPlay);
+			this.addChild(this.helpButton);
+			this.sweetGrid.processMatches();
+		}
+		
+		public function letsGo():void{
+			this.sweetGrid.blurGame(new Array());//essentially 'unblurs' the game because I'm not sending a blurfilter in the array
+			this.scoreBoard.applyShadowFilter();
+			this.movesRemaining.applyShadowFilter();
+			this.timeElapsed.applyShadowFilter();
 			this.sweetGrid.processMatches();
 		}
 		
@@ -190,6 +207,7 @@
 					if(this.sweetGrid.moveIsLogicallyPossible(this.sweet1,this.sweet2)){
 
 						this.gridInputLight.setEnabled(false);
+						this.helpButton.visible = false;
 						
 						trace("Swap is logically possible.");
 						this.sweet1.stopWiggle();

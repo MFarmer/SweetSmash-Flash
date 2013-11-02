@@ -29,13 +29,21 @@
 			this.x = 960/2 - this.width/2;
 			this.y = 320 - this.height/2;
 			
+			this.scoreField.mouseEnabled = false;
+			this.timerField.mouseEnabled = false;
+			this.comboField.mouseEnabled = false;
+			
 			//Setup the static labels
+			this.scoreLabel.mouseEnabled = false;
 			this.scoreLabel.autoSize = "left";
 			this.scoreLabel.defaultTextFormat = new TextFormat('Hobo Std',24,0x6bd8ae);
+			this.timerLabel.mouseEnabled = false;
 			this.timerLabel.autoSize = "left";
 			this.timerLabel.defaultTextFormat = new TextFormat('Hobo Std',24,0x6bd8ae);
+			this.comboLabel.mouseEnabled = false;
 			this.comboLabel.autoSize = "left";
 			this.comboLabel.defaultTextFormat = new TextFormat('Hobo Std',24,0x6bd8ae);
+			this.finalScoreLabel.mouseEnabled = false;
 			this.finalScoreLabel.autoSize = "left";
 			this.finalScoreLabel.defaultTextFormat = new TextFormat('Hobo Std',24,0x6bd8ae);
 			

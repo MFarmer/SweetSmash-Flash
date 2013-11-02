@@ -162,6 +162,7 @@
 				
 				if(this.myGame.movesRemaining.getValue() > 0){
 					this.myGame.gridInputLight.setEnabled(true);
+					this.myGame.helpButton.visible = true;
 				}else{
 					trace("Game Over!");
 					this.myGame.addChild(this.myGame.recapBoard);
