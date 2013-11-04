@@ -407,16 +407,13 @@
 			//Begin the explosions. When the explosions end, sweets will settle.
 			for(i=0; i<this.matchBucket.length; i++){
 				this.matchBucket[i].isMatched = true;
-				this.matchBucket[i].startExplode(uniqueSweetCount);
+				//this.matchBucket[i].startExplode(uniqueSweetCount);
+				this.matchBucket[i].gotoAndStop(6);//switch to the package icon
 			}
 			
 			//Play explosion sound effect
 			if(this.matchBucket.length < 5){
-				if(Math.floor(Math.random() * 2)){
-					this.explode1Sound.play();
-				}else{
-					this.explode11Sound.play();
-				}
+				this.explode1Sound.play();
 			}else if(this.matchBucket.length < 10){
 				this.explode1Sound.play();
 				this.explode2Sound.play();
@@ -424,11 +421,32 @@
 				this.explode1Sound.play();
 				this.explode2Sound.play();
 				this.explode3Sound.play();
+				this.explode11Sound.play();
 			}
 			
 			//For each match, add 25 pts to the scoreboard
 			this.myGame.scoreBoard.updateText(25*this.matchBucket.length);
+			
+			//Wait some time before processing the matches
+			var myTimer:Timer = new Timer(375, 1);
+            myTimer.addEventListener("timer", timerHandler);
+            myTimer.start();
 		}
+		
+		public function timerHandler(event:TimerEvent):void {
+            trace("Settle sweets");
+			for(var i:uint=0; i<this.matchBucket.length; i++){
+				//Safely remove the sweet from the board.
+				if(this.matchBucket[i].parent){
+					try{
+						this.matchBucket[i].parent.removeChild(this.matchBucket[i]);
+					}catch(err:Error){
+						trace("particle list not removing");
+					}
+				}
+			}
+			this.settleSweets();
+        }
 		
 		//############################################################
 		//# Place Special Sweets
@@ -532,7 +550,7 @@
 					this.myGame.addChild(this.grid["row"+i+"col"+col]);
 					
 					var mySweet = this.grid["row"+i+"col"+col];
-					mySweet.moveToPosition(mySweet.getOriginX(),mySweet.getOriginY(),10,0,"processMatches",totalFreeSpaces);
+					mySweet.moveToPosition(mySweet.getOriginX(),mySweet.getOriginY(),5,0,"processMatches",totalFreeSpaces);
 					
 					//Setup all sweets to listen for mouse up/down (Drags)
 					mySweet.addEventListener(MouseEvent.MOUSE_DOWN,mySweet.wiggle);

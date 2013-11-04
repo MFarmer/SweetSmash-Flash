@@ -86,8 +86,7 @@
 			this.animateGame.addChild(this.scoreLabel);
 			
 			//Retrieve the final values from the UI
-			//this.finalScore = this.animateGame.scoreBoard.getValue();
-			this.finalScore = 15000;
+			this.finalScore = this.animateGame.scoreBoard.getValue();
 			this.finalTime = Math.floor(900/this.animateGame.timeElapsed.getValue()*100);
 			this.longestCombo = this.animateGame.sweetGrid.longestComboStreak;
 			
