@@ -181,6 +181,16 @@
 			this.animateGame.addChild(this.finalScoreField);
 			this.animateGame.addChild(this.finalScoreLabel);
 			
+			//Update session labels for game
+			if(this.animateGame.highScore.getValue() < this.finalScoreField.getValue()){
+				this.animateGame.highScore.setValue(this.finalScoreField.getValue());
+			}
+			this.animateGame.playsCounter.updateText(1);
+			if(this.animateGame.bestTime.getValue() == 0 || this.animateGame.bestTime.getValue() > this.animateGame.timeElapsed.getValue()){
+				//We have a new best time!
+				this.animateGame.bestTime.setValue(this.animateGame.timeElapsed.getValue());
+			}				
+			
 			//Begin Anew
 			this.addEventListener(MouseEvent.MOUSE_DOWN,this.startNewGame);
 		}

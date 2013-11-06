@@ -11,6 +11,7 @@
 	public class SweetSmash extends MovieClip{
 		
 		public var topBar:TopBar = new TopBar();
+		public var sessionBar:SessionBG = new SessionBG();
 		public var kitchen:Kitchen = new Kitchen();
 		
 		//Controls whether the user can interact with the grid or not at various times
@@ -18,8 +19,11 @@
 		
 		//Scoreboard
 		public var scoreBoard:HUDInfoText = new HUDInfoText(0,"SCORE",32,15,16);
-		public var movesRemaining:HUDInfoText = new HUDInfoText(5,"MOVES LEFT",32,690,16);
+		public var movesRemaining:HUDInfoText = new HUDInfoText(50,"MOVES LEFT",32,690,16);
 		public var timeElapsed:HUDInfoText = new HUDInfoText(0,"ELAPSED TIME",32,275,16);
+		public var playsCounter:HUDInfoText = new HUDInfoText(0,"",20,592,102);
+		public var bestTime:HUDInfoText = new HUDInfoText(0,"",20,692,102);
+		public var highScore:HUDInfoText = new HUDInfoText(0,"",20,829,102);
 		
 		//Sound Effect
 		public var swapSound:Sound;
@@ -65,10 +69,10 @@
 			addChild(this.scoreBoard);
 			addChild(this.movesRemaining);
 			addChild(this.timeElapsed);
+			addChild(this.playsCounter);
+			addChild(this.bestTime);
+			addChild(this.highScore);
 			timer.start();
-			
-			//Place kitchen
-			addChild(this.kitchen);
 			
 			//Draw input light to tell user when input is or is not allowed
 			this.gridInputLight = new ToggleLight(600,600);
@@ -78,7 +82,7 @@
 			this.showMainMenu();
 			
 			//Debugging
-			//this.addEventListener(MouseEvent.MOUSE_DOWN,printCursorPosition);
+			this.addEventListener(MouseEvent.MOUSE_DOWN,printCursorPosition);
 		}
 		
 		//#########################
@@ -101,8 +105,17 @@
 		//#	Build Background
 		//#########################
 		private function buildBackground():void{
+			//Place kitchen
+			this.addChild(this.kitchen);
+			
+			//Place session bar
+			this.sessionBar.x = 576;
+			this.sessionBar.y = 64;
+			this.sessionBar.gotoAndStop(1);
+			this.addChild(this.sessionBar);
+			
 			//Place TopBar
-			addChild(topBar);
+			this.addChild(topBar);
 			
 			//Place tiles
 			this.tileGrid = new Array();
@@ -152,7 +165,7 @@
 			
 			if(this.sweetGrid.grid["row0col0"]){
 				trace("Resetting grid!");
-				this.movesRemaining.resetValue(5);
+				this.movesRemaining.resetValue(50);
 				this.timeElapsed.resetValue(0);
 				this.scoreBoard.resetValue(0);
 				this.removeChild(this.recapBoard);

@@ -196,7 +196,7 @@
 		//############################################################
 		public function blurGame(blurEffect:Array):void{
 
-			//Blur the sweets
+			//Blur the sweets and tiles
 			for(var row:uint=0; row<9; row++){
 				for(var col:uint=0; col<9; col++){
 					this.grid["row"+row+"col"+col].filters = blurEffect;

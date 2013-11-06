@@ -21,6 +21,12 @@
 			
 			this.refreshText();
 		}
+		
+		public function setValue(x:int):void{
+			this.scoreValue = x;
+			this.refreshText();
+		}
+		
 		public function updateText(x:int):void{
 			this.scoreValue += x;
 			this.refreshText();
