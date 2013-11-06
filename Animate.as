@@ -2,9 +2,25 @@
 	import flash.events.Event;
 	import flash.display.MovieClip;
 	import flash.events.MouseEvent;
+	import flash.utils.Timer;
+	import flash.events.TimerEvent;
 	
 	public class Animate extends MovieClip{
-
+		public var animateSweet:Sweet;
+		public var animateGame:SweetSmash;
+		
+		private var myTimer:Timer;
+		
+		//Static
+		private static var swapCount:uint;
+		private static var explosionCount:uint;
+		private static var maxNumberOfSweetsToExplode:uint;
+		private static var initializeGridCount:uint;
+		private static var moveDownCount:uint;
+		private static var expectedMoveDownCount:uint;
+		private static var totalToMove:uint;
+		private static var fillEmptySpotsCount:uint;
+		
 		//Jiggle
 		private var leftJiggle:int;
 		private var rightJiggle:uint;
@@ -34,94 +50,33 @@
 		private var fadeSpeed:Number;
 		private var fadeOut:Boolean;
 		
-		//Explode
-		private var particleList:Array = new Array();
-		private var vectorX:Number;
-		private var vectorY:Number;
-		private var mySweet:Sweet;
-		private var myGame:SweetSmash;
-		private var explodeFrameCount:uint;
-		private var explodeMaxFrameCount:uint;
-		private var explodeBlock:Boolean;
-		private var explodeParticleCount:uint;
+		//Move To Position
+		private var moveToDestinationX:int;
+		private var moveToDestinationY:int;
+		private var moveToStepX:Number;
+		private var moveToStepY:Number;
+		private var moveToFrameCount:uint;
+		private var moveToMaxFrameCount:uint;
+		private var moveToNextAction:String;
 		
 		//Move Down
 		private var isMovingDown:Boolean;
 		private var moveDownSpeed:Number;
 		private var depthGoal:int;
+		private var moveDownCheck:String;
 		
+		//Wiggle
+		private var wiggleRotateLeft:Boolean;
+		private var wiggleScaleUp:Boolean;
+		private var wiggleRotateStep:Number;
+		private var isWiggling:Boolean;
+		
+		//#########################
+		//#	Constructor
+		//#########################
 		public function Animate() {
 			// constructor code
 			this.isJiggling = false;
-		}
-		
-		//#########################
-		//#	Jiggle
-		//#########################
-		public function startJiggle(deltaLeft:uint,deltaRight:uint):void{
-			this.isJiggling = true;
-			this.leftJiggle = this.x - deltaLeft;
-			this.rightJiggle = this.x + deltaRight;
-			this.movingLeft = false;
-			this.addEventListener(Event.ENTER_FRAME,performJiggle);
-		}
-		
-		public function stopJiggle():void{
-			if(this.isJiggling){
-				this.removeEventListener(Event.ENTER_FRAME,performJiggle);
-			}else{
-				trace("Error: Sweet is not jiggling, therefore the 'stopJiggling' call was ignored.");
-			}
-		}
-
-		private function performJiggle(event:Event):void{
-			if(this.movingLeft){
-				if(this.x > this.leftJiggle){
-					this.x--;
-				}else{
-					this.movingLeft = false;
-				}
-			}else{
-				if(this.x < this.rightJiggle){
-					this.x++;
-				}else{
-					this.movingLeft = true;
-				}
-			}
-		}
-		
-		//#########################
-		//#	Blink
-		//#########################
-		public function startBlink(blinkPhaseFrameCount:uint,blinkIterationCount:uint):void{
-			this.blinkTotalFrameCount = 0;
-			this.blinkPhaseFrameCount = blinkPhaseFrameCount;
-			this.blinkIterationCount = blinkIterationCount;
-			this.blinkOn = false;
-			
-			this.addEventListener(Event.ENTER_FRAME,performBlink);
-		}
-		
-		private function performBlink(event:Event):void{
-			if(this.blinkOn){
-				//this.alpha = 1.0;
-				this.visible = true;
-			}else{
-				//this.alpha = 0.0;
-				this.visible = false;
-			}
-			
-			if(this.blinkTotalFrameCount % this.blinkPhaseFrameCount == 0){
-				//A phase has ended, so flip the blinkOn variable.
-				this.blinkOn = !this.blinkOn;
-			}
-			
-			if(this.blinkTotalFrameCount >= (this.blinkPhaseFrameCount * this.blinkIterationCount)){
-				this.visible = true;
-				this.removeEventListener(Event.ENTER_FRAME,performBlink);
-			}
-			
-			this.blinkTotalFrameCount++;
 		}
 		
 		//#########################
@@ -151,71 +106,9 @@
 			}
 		}
 		
-		//#########################
-		//#	Explode on Mouse Event
-		//#########################
-		public function explodeOn(mySweet:Sweet,myGame:SweetSmash):void{
-			this.mySweet = mySweet;
-			this.myGame = myGame;
-			this.explodeFrameCount = 0;
-			this.explodeMaxFrameCount = 60;
-			this.explodeBlock = false;
-			this.explodeParticleCount = 30;
-			this.addEventListener(MouseEvent.MOUSE_DOWN,startExplode);
-		}
-		
-		private function startExplode(event:MouseEvent):void{
-			//Remove the icon which was clicked
-			//this.mySweet.mouseEnabled = false;
-			//this.mySweet.startBlink(3,20);
-			this.myGame.removeChild(mySweet);
-			
-			//this.myGame.removeChild(mySweet);
-			//Place 10 items on the center of the clicked icon
-			if(!this.explodeBlock){
-				this.explodeBlock = true;
-				for(var i:uint=0; i<this.explodeParticleCount; i++){
-					this.particleList.push(new Sweet(this.mySweet.x,this.mySweet.y,this.mySweet.defaultFrame));
-					this.particleList[i].scaleX = 0.5;
-					this.particleList[i].scaleY = this.particleList[i].scaleX;
-					this.particleList[i].rotation = Math.floor(Math.random() * 360);
-					this.particleList[i].vectorX = Math.floor(Math.random() * 20 - 10);
-					this.particleList[i].vectorY = Math.floor(Math.random() * 20 - 10);
-					this.particleList[i].startSpin(Math.floor(Math.random()*10),true);
-					this.particleList[i].startPulse(0.3,0.5,0.1);
-					this.particleList[i].startFade(60,true);
-					this.particleList[i].mouseEnabled = false;
-					this.myGame.addChild(this.particleList[i]);
-				}
-				this.addEventListener(Event.ENTER_FRAME,animateExplode);
-			}else{
-				trace("Ignored startExplode since it is already in progress from a prior click.");
-			}
-		}
-		
-		private function animateExplode(event:Event):void{
-			for(var i:uint=0; i<this.particleList.length; i++){
-				//Should gravity now affect course?
-				if(this.explodeFrameCount % 10 == 0){
-					this.particleList[i].vectorY-=3;
-				}
-				//Move the particles
-				this.particleList[i].x -= this.particleList[i].vectorX;
-				this.particleList[i].y -= this.particleList[i].vectorY;
-			}
-			
-			if(this.explodeFrameCount >= this.explodeMaxFrameCount){
-				//Explosion has ended
-				for(i=0; i<this.particleList.length; i++){
-					this.myGame.removeChild(this.particleList[i]);
-				}
-				this.particleList = new Array();
-				this.removeEventListener(Event.ENTER_FRAME,animateExplode);
-				this.explodeFrameCount = 0;
-				this.explodeBlock = false;
-			}
-			
-			this.explodeFrameCount++;
+		private function stopFade():void{
+			this.removeEventListener(Event.ENTER_FRAME,performFade);
+			trace("Stopped fade...");
 		}
 		
 		//#########################
@@ -240,10 +133,71 @@
 			}
 		}
 		
+		private function stopSpin():void{
+			this.addEventListener(Event.ENTER_FRAME,performSpin);
+			trace("Stopped spin...");
+		}
+		
+		//#########################
+		//#	Move To Position
+		//#########################
+		public function moveToPosition(destinationX:int, destinationY:int, speed:Number,delay:uint,nextAction:String,totalToMove:uint):void{
+			Animate.swapCount = 0;
+			Animate.initializeGridCount = 0;
+			Animate.fillEmptySpotsCount = 0;
+			Animate.totalToMove = totalToMove;
+			this.moveToNextAction = nextAction;
+			this.moveToDestinationX = destinationX;
+			this.moveToDestinationY = destinationY;
+			this.moveToFrameCount = 0;
+			this.moveToMaxFrameCount = speed;
+			this.moveToStepX = (this.moveToDestinationX - this.x)/this.moveToMaxFrameCount;
+			this.moveToStepY = (this.moveToDestinationY - this.y)/this.moveToMaxFrameCount;
+			
+			this.moveTo();
+		}
+		
+		private function moveTo():void{
+			//this.myTimer.removeEventListener(TimerEvent.TIMER,moveTo);
+			//this.myTimer = null;
+			this.addEventListener(Event.ENTER_FRAME,performMoveToPosition);
+		}
+		
+		private function performMoveToPosition(event:Event):void{
+			this.x += this.moveToStepX;
+			this.y += this.moveToStepY;
+			
+			if(++this.moveToFrameCount == this.moveToMaxFrameCount){
+				//Movement has concluded
+				this.x = this.moveToDestinationX;
+				this.y = this.moveToDestinationY;
+				this.removeEventListener(Event.ENTER_FRAME,performMoveToPosition);
+				
+				
+				if(moveToNextAction == "showAllMatches"){
+					Animate.swapCount++;
+					if(Animate.swapCount == Animate.totalToMove){
+						Animate.swapCount = 0;
+						this.animateGame.sweetGrid.showAllMatchedSweets();
+					}
+				}else if(moveToNextAction == "processMatches"){
+					Animate.initializeGridCount++;
+					trace("Sweet is ready! "+Animate.initializeGridCount+"/"+Animate.totalToMove);
+					if(Animate.initializeGridCount == Animate.totalToMove){
+						Animate.initializeGridCount = 0;
+						this.animateGame.sweetGrid.processMatches();
+					}
+				}
+			}
+		}
+		
 		//#########################
 		//#	Move Down X Units of N Pixels
 		//#########################
-		public function moveDown(units:uint, pixels:uint, speed:Number){
+		public function moveDown(units:uint, pixels:uint, speed:Number,check:String,numberOfSweetsMovingDown:uint){
+			Animate.moveDownCount = 0;
+			this.moveDownCheck = check;
+			Animate.expectedMoveDownCount = numberOfSweetsMovingDown;
 			this.isMovingDown = true;
 			this.depthGoal = this.y + units * pixels;
 			this.moveDownSpeed = speed;
@@ -258,6 +212,19 @@
 					this.y = this.depthGoal;
 					this.isMovingDown = false;
 					this.removeEventListener(Event.ENTER_FRAME,performMoveDown);
+					
+					if(this.moveDownCheck == "settling"){
+						Animate.moveDownCount++;
+						
+						
+						if(Animate.moveDownCount == Animate.expectedMoveDownCount){
+							//All Sweets have moved down, and thus the new sweets are ready to be placed onto the grid
+							trace("Ready to place new sweets!");
+							this.animateGame.sweetGrid.placeNewSweets();
+						}else{
+							trace("Move Down not complete! "+Animate.moveDownCount+"/"+Animate.expectedMoveDownCount);
+						}
+					}
 				}
 			}
 		}
@@ -265,6 +232,54 @@
 		//#########################
 		//#	Wiggle
 		//#########################
+		public function wiggle(event:MouseEvent):void{
+			if(this.animateGame.gridInputLight.isEnabled()){
+				this.startWiggle();
+				
+				//Record which sweet is currently chosen
+				this.animateGame.sweet1 = this.animateSweet;
+			}else{
+				trace("Note: Grid input is disabled, so the icon click was ignored.");
+			}
+		}
+		
+		public function startWiggle():void{
+			this.isWiggling = true;
+			this.wiggleRotateLeft = true;
+			this.wiggleScaleUp = true;
+			this.wiggleRotateStep = 2;
+			this.addEventListener(Event.ENTER_FRAME,performWiggle);
+			this.startPulse(1.0,1.1,0.01);
+		}
+		
+		public function stopWiggle():void{
+			if(this.isWiggling){
+				this.removeEventListener(Event.ENTER_FRAME,performWiggle);
+				this.removeEventListener(Event.ENTER_FRAME,performPulse);
+				this.rotation = 0;
+				this.scaleX = 1.0;
+				this.scaleY = 1.0;
+				this.isWiggling = false;
+			}else{
+				trace("Error: Tried to stopWiggle on an icon that wasn't wiggling.");
+			}
+		}
+		
+		private function performWiggle(event:Event):void{
+			//Handle the sway
+			if(this.wiggleRotateLeft){
+				this.rotation -= this.wiggleRotateStep;
+				if(this.rotation <= -20){
+					this.wiggleRotateLeft = false;
+				}
+			}else{
+				this.rotation += this.wiggleRotateStep;
+				if(this.rotation >= 20){
+					this.wiggleRotateLeft = true;
+				}
+			}
+			
+		}
 		
 		//#########################
 		//#	Pulse
@@ -293,6 +308,13 @@
 				}
 			}
 			this.scaleY = this.scaleX;
+		}
+		
+		public function stopPulse():void{
+			this.removeEventListener(Event.ENTER_FRAME,performPulse);
+			this.scaleX = 1;
+			this.scaleY = 1;
+			trace("Stopping pulse...");
 		}
 	}
 	
