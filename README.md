@@ -35,4 +35,5 @@ This game is my first Flash game effort, and was written primarily as a learning
 <h3>Known Bugs</h3>
 <ul>
 	<li>Rarely, the game will lock up after a player has made a move, which can only be fixed by refreshing the page. This tends to happen in the opening move of a game.</li>
+	<li>If a match of 4 or more sweets occurs during an automatic 'refilling' of the board (in other words, not something which occurred directly from a player move), a jelly bean appears at the location of the player's last move rather than where the 4+ match occurred. Fixing this will require refactoring the findRowMatches/findColMatches functions to better record and act on these occurrences.</li>
 </ul>
