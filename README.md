@@ -1,4 +1,4 @@
-![Screenshot](https://github.com/MFarmer/SweetSmash-Flash/blob/master/Screenshot/sample1.png)
+![Screenshot](https://github.com/MFarmer/SweetSmash-Flash/master/Screenshot/sample1.png)
 <h1>Sweet Smash (Flash Version)</h1>
 ======
 
@@ -7,13 +7,19 @@
 Sweet Smash is a puzzle game written in ActionScript 3.0.
 
 <h3>Objective</h3>
-The objective of the game is to swap neighboring individual sweets strategically into positions so that at least one row or column of 3, 4, or 5 matching sweets is created. When such a match occurs, the sweets are said to be packaged together, and the player's score is increased by 25 points per matched sweet. In addition, the matched sweets are removed from the board, and the board repopulates with new sweets and settles existing sweets into new positions. Once the board has repopulated itself with new sweets to take the place of the matched ones, the player may make another move until all 50 moves have been made. Once there are no more moves, the player's score is tallied and a new game begins.
+The objective of the game is to score as many points as possible by swapping neighboring individual sweets strategically into positions so that at least one row or column of 3, 4, or 5 matching sweets is created. When such a match occurs, the sweets are said to be packaged together, and the player's score is increased by 25 points per matched sweet. In addition, the matched sweets are removed from the board, and the board repopulates with new sweets and settles existing sweets into new positions. Once the board has repopulated itself with new sweets to take the place of the matched ones, the player may make another move until all 50 moves have been made. Once there are no more moves, the player's score is tallied and a new game begins.
 
 The player's best score, time, and total play count are recorded during the player's current session. However, these values are not persistent, and will disappear when the game is closed.
 
 <h3>Rules</h3>
-
-A sweet may only be moved one space up, down, left or right. No diagonal moves are allowed. A sweet may only be moved IF a match is created after the sweet is swapped with a neighboring sweet. If a match of 4 or 5 sweets is made, one of the middle matched sweets becomes a super version of itself marked with either a vertical or horizontal arrow. A super sweet is exactly like its normal counterpart, except that if the super sweet is involved in a match of a specific direction, the entire row or column the super sweet is in will be matched together, regardless of the type the sweets are. A matched vertical super sweet packages the entire column, and a matched horizontal super sweet packages the entire row. If a super sweet is involved in a match in the opposite direction indicated by the super sweet, the super sweet acts like a normal version of itself and does not match with the entire row or column. Instead, it only matches with the sweets of the same type as normal. When existing sweets are removed from the board, the sweets above the now empty positions fall downward until they settle into position against another sweet. New sweets then are placed in the board at the now unoccupied positions to refill the entire board before the next move is made.
+<ol>
+	<li>A sweet may only be moved one space up, down, left or right.</li>
+	<li>No diagonal moves are allowed.</li>
+	<li>A sweet may only be moved IF a match is created after the sweet is swapped with a neighboring sweet.</li>
+	<li>If a match of 4 or 5 sweets is made, one of the middle matched sweets becomes a jelly bean.</li>
+	<li>If three or more jelly beans are matched together, the entire row/column is matched (depending upon the orientation of the matched jelly beans) and a magical, bouncing jelly bean is left behind.</li>
+	<li>If a magical, bouncing jelly bean is matched with ANY other type of jelly beans, the entire grid is matched.</li>
+</ol>
 
 <h3>Author's Comments</h3>
 
