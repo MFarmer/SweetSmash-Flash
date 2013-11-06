@@ -24,11 +24,11 @@ The player's best score, time, and total play count are recorded during the play
 
 <h3>Author's Comments</h3>
 
-This game is my first Flash game effort, and was written primarily as a learning opportunity. I had created an HTML5 version of this game first for a web development course at my university, and decided to port it to ActionScript 3.0 to learn the inherent similarities/differences between developing a game in Flash vs. HTML5.
+Sweet Smash is my first Flash game effort, and was primarily developed as a learning experience. I had created an <a href="cs2.mwsu.edu/~mfarmer/web_course/sweetsmash/">HTML5 version</a> of this game first for a web development course at my university, and afterwards decided to port the game to ActionScript 3.0. By porting the game, I was able to better understand the inherent similarities/differences between developing a game in Flash vs. HTML5.
 
 <h3>TODO</h3>
 <ul>
-	<li>It'd be nice to have music and a sound toggle button</li>
+	<li>Implement both music, more sound effects, and a sound toggle button</li>
 	<li>Introduce power-ups to spice up gameplay a bit</li>
 	<li>Add more dynamic, graphical feedback when the player amasses long combo streaks or high scoring moves, such as a combo streak counter, flashing lights, etc.</li>
 </ul>
