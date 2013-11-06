@@ -1,6 +1,7 @@
-![Screenshot](mfarmer.github.com/SweetSmash-Flash/Screenshot/sample1.png)
+![ScreenShot](https://raw.github.com/MFarmer/SweetSmash-Flash/master/sample1.png)
 <h1>Sweet Smash (Flash Version)</h1>
-======
+
+The source code is released under the <a href="http://www.gnu.org/licenses/gpl-2.0.html">GPL-v2 License</a>.
 
 <h3>What is Sweet Smash?</h3>
 
