@@ -1,4 +1,4 @@
-![Screenshot](https://github.com/MFarmer/SweetSmash-Flash/master/Screenshot/sample1.png)
+![Screenshot](mfarmer.github.com/SweetSmash-Flash/Screenshot/sample1.png)
 <h1>Sweet Smash (Flash Version)</h1>
 ======
 
