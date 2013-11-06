@@ -1,6 +1,7 @@
 ![Alt text](/Screenshot/sample1.png "Sweet Smash Screenshot")
 <h1>Sweet Smash - Flash (Beta)</h1>
 
+<i>Original Artwork by Matthew Farmer (MFarmer)
 <i>The source code is released under the <a href="http://www.gnu.org/licenses/gpl-2.0.html">GPL-v2 License</a>.</i>
 
 <h3>What is Sweet Smash?</h3>
