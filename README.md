@@ -1,4 +1,4 @@
-![Alt text](/Screenshot/sample1.png "Sweet Smash Screenshot")
+![Sweet Smash Screenshot](/Screenshot/sample1.png "Sweet Smash Screenshot")
 <h1>Sweet Smash - Flash (Beta)</h1>
 
 <i>Original Programming and Artwork by Matthew Farmer (MFarmer)</i><br>
