@@ -83,9 +83,7 @@
 		
 		public function clearHowToPlay(event:MouseEvent):void{
 			this.myGame.removeChild(this.instructionBG);
-			this.prevPageButton.removeEventListener(MouseEvent.MOUSE_DOWN,this.prevPage);
 			this.myGame.removeChild(this.prevPageButton);
-			this.letsGoButton.removeEventListener(MouseEvent.MOUSE_DOWN,this.clearHowToPlay);
 			this.myGame.removeChild(this.letsGoButton);
 			this.myGame.letsGo();
 		}
