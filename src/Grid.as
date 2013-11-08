@@ -452,6 +452,7 @@
 		//# Place Special Sweets
 		//############################################################	
 		public function placeSpecialSweets():void{
+			trace("Placing special sweets... (if any)");
 			for(var i:uint=0; i<this.specialBucket.length; i++){
 				this.grid[this.specialBucket[i]].isMatched = false;
 				this.grid[this.specialBucket[i]].setDefaultFrame(7);

@@ -50,9 +50,6 @@
 		private function showHowToPlay(event:MouseEvent):void{
 			//How to Play was clicked on
 			trace("How to Play was clicked...");
-			this.newGameButton.removeEventListener(MouseEvent.MOUSE_DOWN,this.startNewGame);
-			this.howToPlayButton.removeEventListener(MouseEvent.MOUSE_DOWN,this.showHowToPlay);
-			
 			this.cleanup();
 			this.buildInstructionMenu();
 		}
@@ -64,7 +61,9 @@
 		
 		public function cleanup():void{
 			this.myGame.removeChild(this.menuBG);
+			this.newGameButton.removeEventListener(MouseEvent.MOUSE_DOWN,this.startNewGame);
 			this.myGame.removeChild(this.newGameButton);
+			this.howToPlayButton.removeEventListener(MouseEvent.MOUSE_DOWN,this.showHowToPlay);
 			this.myGame.removeChild(this.howToPlayButton);
 		}
 		
@@ -84,9 +83,10 @@
 		
 		public function clearHowToPlay(event:MouseEvent):void{
 			this.myGame.removeChild(this.instructionBG);
+			this.prevPageButton.removeEventListener(MouseEvent.MOUSE_DOWN,this.prevPage);
 			this.myGame.removeChild(this.prevPageButton);
+			this.letsGoButton.removeEventListener(MouseEvent.MOUSE_DOWN,this.clearHowToPlay);
 			this.myGame.removeChild(this.letsGoButton);
-			
 			this.myGame.letsGo();
 		}
 		

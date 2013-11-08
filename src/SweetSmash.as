@@ -142,8 +142,9 @@
 			this.scoreBoard.applyShadowFilter();
 			this.movesRemaining.applyShadowFilter();
 			this.timeElapsed.applyShadowFilter();
-			//this.removeChild(this.mainMenu);
+			
 			this.mainMenu.cleanup();
+			
 			this.helpButton = new MenuButton(6,845,575);
 			this.helpButton.addEventListener(MouseEvent.MOUSE_DOWN,this.mainMenu.remindHowToPlay);
 			this.addChild(this.helpButton);
@@ -155,6 +156,10 @@
 			this.scoreBoard.applyShadowFilter();
 			this.movesRemaining.applyShadowFilter();
 			this.timeElapsed.applyShadowFilter();
+			
+			this.helpButton = new MenuButton(6,845,575);
+			this.helpButton.addEventListener(MouseEvent.MOUSE_DOWN,this.mainMenu.remindHowToPlay);
+			this.addChild(this.helpButton);
 			this.sweetGrid.processMatches();
 		}
 		
