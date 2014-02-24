@@ -25,7 +25,7 @@ The player's best score, time, and total play count are recorded during the play
 
 <h3>Author's Comments</h3>
 
-Sweet Smash is my first Flash game effort, and was primarily developed as a learning experience. I had created an <a href="cs2.mwsu.edu/~mfarmer/web_course/sweetsmash/">HTML5 version</a> of this game first for a web development course at my university, and afterwards decided to port the game to ActionScript 3.0. By porting the game, I was able to better understand the inherent similarities/differences between developing a game in Flash vs. HTML5.
+Sweet Smash is my first Flash game effort, and was primarily developed as a learning experience. I had created an HTML5 version of this game first for a web development course at my university, and afterwards decided to port the game to ActionScript 3.0. By porting the game, I was able to better understand the inherent similarities/differences between developing a game in Flash vs. HTML5.
 
 <h3>TODO</h3>
 <ul>
